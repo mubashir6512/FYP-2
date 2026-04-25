@@ -1,0 +1,151 @@
+// PaintVerse Database Schema — Prisma ORM
+// Use this to recreate the database externally with: npx prisma migrate dev
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Enums ───────────────────────────────────────────────
+
+enum AppRole {
+  customer
+  dealer
+  painter
+  admin
+
+  @@map("app_role")
+}
+
+// ─── Tables ──────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email     String   @unique @db.Text
+  password  String   @db.Text
+  role      AppRole  @default(customer)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  profile   Profile?
+  products  Product[]
+
+  @@map("users")
+}
+
+model Profile {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @unique @map("user_id") @db.Uuid
+  fullName   String   @default("") @map("full_name") @db.Text
+  avatarUrl  String?  @map("avatar_url") @db.Text
+  phone      String?  @db.Text
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Product {
+  id                String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dealerId          String   @map("dealer_id") @db.Uuid
+  name              String   @db.Text
+  sku               String?  @db.Text
+  category          String   @default("paint") @db.Text
+  brand             String?  @db.Text
+  colorHex          String?  @map("color_hex") @db.Text
+  unit              String   @default("litre") @db.Text
+  description       String?  @db.Text
+  imageUrl          String?  @map("image_url") @db.Text
+  price             Decimal  @default(0) @db.Decimal
+  costPrice         Decimal  @default(0) @map("cost_price") @db.Decimal
+  stockQuantity     Int      @default(0) @map("stock_quantity")
+  lowStockThreshold Int      @default(10) @map("low_stock_threshold")
+  isActive          Boolean  @default(true) @map("is_active")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  dealer            User     @relation(fields: [dealerId], references: [id], onDelete: Cascade)
+  orderItems        PosOrderItem[]
+
+  @@map("products")
+}
+
+model PosOrder {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  dealerId       String   @map("dealer_id") @db.Uuid
+  customerId     String?  @map("customer_id") @db.Uuid
+  customerName   String?  @map("customer_name") @db.Text
+  customerPhone  String?  @map("customer_phone") @db.Text
+  orderNumber    String   @map("order_number") @db.Text
+  subtotal       Decimal  @default(0) @db.Decimal
+  taxAmount      Decimal  @default(0) @map("tax_amount") @db.Decimal
+  discountAmount Decimal  @default(0) @map("discount_amount") @db.Decimal
+  total          Decimal  @default(0) @db.Decimal
+  paymentMethod  String   @default("cash") @map("payment_method") @db.Text
+  status         String   @default("completed") @db.Text
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  items          PosOrderItem[]
+
+  @@map("pos_orders")
+}
+
+model PosOrderItem {
+  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId     String   @map("order_id") @db.Uuid
+  productId   String   @map("product_id") @db.Uuid
+  productName String   @map("product_name") @db.Text
+  quantity    Int      @default(1)
+  unitPrice   Decimal  @map("unit_price") @db.Decimal
+  totalPrice  Decimal  @map("total_price") @db.Decimal
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  order       PosOrder @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product     Product  @relation(fields: [productId], references: [id])
+
+  @@map("pos_order_items")
+}
+
+model PainterJob {
+  id             String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  painterId      String   @map("painter_id") @db.Uuid
+  customerId     String   @map("customer_id") @db.Uuid
+  customerName   String   @default("") @map("customer_name") @db.Text
+  customerPhone  String?  @map("customer_phone") @db.Text
+  location       String   @default("") @db.Text
+  jobType        String   @default("interior") @map("job_type") @db.Text
+  description    String?  @db.Text
+  scheduledDate  DateTime? @map("scheduled_date") @db.Date
+  scheduledTime  String?  @map("scheduled_time") @db.Text
+  estimatedHours Int      @default(0) @map("estimated_hours")
+  estimatedCost  Decimal  @default(0) @map("estimated_cost") @db.Decimal
+  status         String   @default("pending") @db.Text
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+
+  reviews        PainterReview[]
+
+  @@map("painter_jobs")
+}
+
+model PainterReview {
+  id           String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  painterId    String   @map("painter_id") @db.Uuid
+  customerId   String   @map("customer_id") @db.Uuid
+  jobId        String?  @map("job_id") @db.Uuid
+  rating       Int
+  comment      String?  @db.Text
+  customerName String   @default("") @map("customer_name") @db.Text
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  job          PainterJob? @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@map("painter_reviews")
+}
