@@ -16,7 +16,7 @@ export const register = async (req: Request, res: Response) => {
 
         console.log('Hashing password...');
         const hashedPassword = await bcrypt.hash(password, 10);
-        
+
         console.log('Creating user in DB...');
         const user = await prisma.user.create({
             data: {
@@ -36,14 +36,14 @@ export const register = async (req: Request, res: Response) => {
         console.log('User created successfully:', user.id);
         console.log('Generating token...');
         const token = generateToken({ id: user.id, role: user.role });
-        
+
         console.log('Registration complete, sending response');
         res.status(201).json({ user, token });
     } catch (error) {
         console.error('Registration Error:', error);
-        res.status(500).json({ 
-            message: 'Server error during registration', 
-            error: error instanceof Error ? error.message : error 
+        res.status(500).json({
+            message: 'Server error during registration',
+            error: error instanceof Error ? error.message : error
         });
     }
 };
@@ -90,10 +90,10 @@ export const getMe = async (req: any, res: Response) => {
     }
 };
 export const updateProfile = async (req: any, res: Response) => {
-    const { 
-        fullName, phone, avatarUrl, bio, businessName, 
-        address, city, notifications, specialization, 
-        experience, hourlyRate, skills, availability 
+    const {
+        fullName, phone, avatarUrl, bio, businessName,
+        address, city, notifications, specialization,
+        experience, hourlyRate, skills, availability
     } = req.body;
 
     try {
@@ -108,8 +108,8 @@ export const updateProfile = async (req: any, res: Response) => {
                 address,
                 city,
                 specialization,
-                experience: (experience !== undefined && experience !== null && experience !== "") ? parseInt(experience.toString()) : undefined,
-                hourlyRate: (hourlyRate !== undefined && hourlyRate !== null && hourlyRate !== "") ? parseFloat(hourlyRate.toString()) : undefined,
+                experience: (experience !== undefined && experience !== null && experience !== "") ? parseInt(experience.toString()) : null,
+                hourlyRate: (hourlyRate !== undefined && hourlyRate !== null && hourlyRate !== "") ? parseFloat(hourlyRate.toString()) : null,
                 skills,
                 availability,
                 notifications: notifications as any,
