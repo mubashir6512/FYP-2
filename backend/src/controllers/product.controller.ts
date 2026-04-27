@@ -6,6 +6,15 @@ export const getProducts = async (req: Request, res: Response) => {
     try {
         const products = await prisma.product.findMany({
             where: { isActive: true },
+            include: {
+                dealer: {
+                    select: {
+                        id: true,
+                        email: true,
+                        profile: true
+                    }
+                }
+            }
         });
         res.json(products);
     } catch (error) {

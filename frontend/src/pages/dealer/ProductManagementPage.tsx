@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { PageHeader, EmptyState } from "@/components/dashboard/DashboardComponents";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,13 @@ import {
   Trash2,
   X,
   Save,
+  Tag,
+  Hash,
+  Layers,
+  Palette,
+  DollarSign,
+  Info,
+  Building,
 } from "lucide-react";
 
 interface ProductForm {
@@ -48,11 +55,25 @@ const emptyForm: ProductForm = {
 };
 
 export default function ProductManagementPage() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [form, setForm] = useState<ProductForm>(emptyForm);
+  const [form, setForm] = useState<ProductForm>({
+    ...emptyForm,
+    brand: profile?.businessName || ""
+  });
+
+  // Sync brand with profile business name once it loads
+  useEffect(() => {
+    // Only auto-populate if we are adding a NEW product and brand is currently empty
+    if (!editingId && !form.brand) {
+      const brandName = profile?.businessName || (user as any)?.fullName;
+      if (brandName) {
+        setForm(prev => ({ ...prev, brand: brandName }));
+      }
+    }
+  }, [profile, user, editingId]);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["dealer-products", user?.id],
@@ -112,7 +133,10 @@ export default function ProductManagementPage() {
   const resetForm = () => {
     setShowForm(false);
     setEditingId(null);
-    setForm(emptyForm);
+    setForm({
+      ...emptyForm,
+      brand: profile?.businessName || ""
+    });
   };
 
   const editProduct = (product: any) => {
@@ -139,6 +163,17 @@ export default function ProductManagementPage() {
       toast.error("Name and price are required");
       return;
     }
+
+    // Auto-generate SKU if empty
+    let finalForm = { ...form };
+    if (!form.sku) {
+      const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const prefix = form.brand ? form.brand.substring(0, 3).toUpperCase() : "PV";
+      const cat = form.category.substring(0, 3).toUpperCase();
+      finalForm.sku = `${prefix}-${cat}-${random}`;
+      setForm(finalForm);
+    }
+    
     saveMutation.mutate();
   };
 
@@ -176,29 +211,72 @@ export default function ProductManagementPage() {
             <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-medium text-foreground mb-1 block">Name *</label>
-                <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+                <div className="relative">
+                  <Tag className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required className="pl-10" placeholder="e.g. Premium Silk Finish" />
+                </div>
               </div>
-              <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">SKU</label>
-                <Input value={form.sku} onChange={(e) => setForm({ ...form, sku: e.target.value })} placeholder="e.g. OB-001" />
+              <div className="sm:col-span-1">
+                <label className="text-sm font-medium text-foreground mb-1 block flex items-center justify-between">
+                  SKU
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+                      const prefix = form.brand ? form.brand.substring(0, 3).toUpperCase() : "PV";
+                      const cat = form.category.substring(0, 3).toUpperCase();
+                      setForm({ ...form, sku: `${prefix}-${cat}-${random}` });
+                    }}
+                    className="text-[10px] text-accent hover:underline uppercase font-bold"
+                  >
+                    Generate
+                  </button>
+                </label>
+                <div className="relative">
+                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input 
+                    value={form.sku} 
+                    onChange={(e) => setForm({ ...form, sku: e.target.value })} 
+                    placeholder="e.g. PV-PNT-A1B2" 
+                    className="pl-10"
+                  />
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1 block">Category</label>
-                <select
-                  value={form.category}
-                  onChange={(e) => setForm({ ...form, category: e.target.value })}
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
-                >
-                  <option value="paint">Paint</option>
-                  <option value="primer">Primer</option>
-                  <option value="stain">Stain</option>
-                  <option value="accessories">Accessories</option>
-                  <option value="tools">Tools</option>
-                </select>
+                <div className="relative">
+                  <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
+                  <select
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    className="w-full h-10 rounded-md border border-input bg-background pl-10 pr-3 text-sm focus:ring-2 focus:ring-accent outline-none"
+                  >
+                    <option value="paint">Paint</option>
+                    <option value="primer">Primer</option>
+                    <option value="stain">Stain</option>
+                    <option value="accessories">Accessories</option>
+                    <option value="tools">Tools</option>
+                  </select>
+                </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">Brand</label>
-                <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} />
+                <label className="text-sm font-medium text-foreground mb-1 block flex items-center justify-between">
+                  Brand
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      const brandName = profile?.businessName || (user as any)?.fullName;
+                      if (brandName) setForm({ ...form, brand: brandName });
+                    }}
+                    className="text-[10px] text-accent hover:underline uppercase font-bold"
+                  >
+                    Use My Name
+                  </button>
+                </label>
+                <div className="relative">
+                  <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="pl-10" />
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1 block">Color</label>
@@ -226,12 +304,18 @@ export default function ProductManagementPage() {
                 </select>
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">Selling Price (₹) *</label>
-                <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required min="0" step="0.01" />
+                <label className="text-sm font-medium text-foreground mb-1 block">Selling Price *</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} required min="0" step="0.01" className="pl-10" placeholder="0.00" />
+                </div>
               </div>
               <div>
-                <label className="text-sm font-medium text-foreground mb-1 block">Cost Price (₹)</label>
-                <Input type="number" value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: e.target.value })} min="0" step="0.01" />
+                <label className="text-sm font-medium text-foreground mb-1 block">Cost Price</label>
+                <div className="relative">
+                  <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input type="number" value={form.costPrice} onChange={(e) => setForm({ ...form, costPrice: e.target.value })} min="0" step="0.01" className="pl-10" placeholder="0.00" />
+                </div>
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-1 block">Stock Qty</label>
@@ -243,7 +327,10 @@ export default function ProductManagementPage() {
               </div>
               <div className="sm:col-span-2">
                 <label className="text-sm font-medium text-foreground mb-1 block">Description</label>
-                <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                <div className="relative">
+                  <Info className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+                  <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="pl-10" placeholder="Optional product details..." />
+                </div>
               </div>
               <div className="flex items-end">
                 <Button type="submit" variant="accent" className="gap-2 w-full" disabled={saveMutation.isPending}>
@@ -288,7 +375,7 @@ export default function ProductManagementPage() {
                   <Badge variant="secondary" className="text-xs ml-2">{product.category}</Badge>
                 </div>
                 <div className="flex items-center justify-between mt-3">
-                  <span className="font-bold text-accent">₹{product.price}</span>
+                  <span className="font-bold text-accent">Rs. {product.price}</span>
                   <Badge variant={product.stockQuantity <= product.lowStockThreshold ? "warning" : "success"}>
                     {product.stockQuantity} in stock
                   </Badge>

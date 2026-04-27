@@ -34,12 +34,12 @@ export function PaintersSection() {
   const painters = paintersList.map((p: any) => ({
     id: p.id,
     name: p.profile?.fullName || p.email,
-    specialty: p.profile?.specialty || "Professional Painter",
+    specialty: p.profile?.specialization || "Professional Painter",
     rating: Number(p.profile?.rating || 4.5),
     reviews: p.profile?.reviewsCount || 0,
-    location: p.profile?.address || "Available Locally",
+    location: p.profile?.city || p.profile?.address || "Available Locally",
     experience: `${p.profile?.experience || 5} years`,
-    hourlyRate: Number(p.profile?.hourlyRate || 50),
+    hourlyRate: Number(p.profile?.hourlyRate) > 0 ? Number(p.profile?.hourlyRate) : 500,
     availability: p.profile?.availability || "Available",
     avatar: (p.profile?.fullName || p.email).substring(0, 2).toUpperCase(),
     skills: p.profile?.skills || ["Interior", "Exterior"],
@@ -66,90 +66,102 @@ export function PaintersSection() {
         </motion.div>
 
         {/* Painters Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-          {painters.map((painter, index) => (
-            <motion.div
-              key={painter.id}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-            >
-              <Card variant="elevated" className="overflow-hidden">
-                <CardContent className="p-6">
-                  {/* Header */}
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-lg">
-                      {painter.avatar}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-foreground text-lg">
-                        {painter.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">{painter.specialty}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <Star className="w-4 h-4 fill-warning text-warning" />
-                        <span className="text-sm font-medium">{painter.rating}</span>
-                        <span className="text-sm text-muted-foreground">
-                          ({painter.reviews} reviews)
-                        </span>
+        {painters.length === 0 ? (
+          <div className="text-center py-24 bg-background/50 rounded-3xl border border-dashed border-border mb-12">
+            <div className="w-16 h-16 bg-muted rounded-full flex items-center justify-center mx-auto mb-4">
+              <Briefcase className="w-8 h-8 text-muted-foreground opacity-50" />
+            </div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">No Painters Found</h3>
+            <p className="text-muted-foreground max-w-md mx-auto">
+              We couldn't find any verified painters at the moment. Check back soon or join as a painter to offer your services!
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            {painters.map((painter, index) => (
+              <motion.div
+                key={painter.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card variant="elevated" className="overflow-hidden">
+                  <CardContent className="p-6">
+                    {/* Header */}
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold text-lg">
+                        {painter.avatar}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-foreground text-lg">
+                          {painter.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">{painter.specialty}</p>
+                        <div className="flex items-center gap-2 mt-1">
+                          <Star className="w-4 h-4 fill-warning text-warning" />
+                          <span className="text-sm font-medium">{painter.rating}</span>
+                          <span className="text-sm text-muted-foreground">
+                            ({painter.reviews} reviews)
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Details */}
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="w-4 h-4" />
-                      {painter.location}
+                    {/* Details */}
+                    <div className="space-y-2 mb-4">
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <MapPin className="w-4 h-4" />
+                        {painter.location}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                        <Briefcase className="w-4 h-4" />
+                        {painter.experience} experience
+                      </div>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Clock className="w-4 h-4 text-muted-foreground" />
+                        <Badge
+                          variant={painter.availability === "Available" ? "success" : "warning"}
+                        >
+                          {painter.availability}
+                        </Badge>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Briefcase className="w-4 h-4" />
-                      {painter.experience} experience
+
+                    {/* Skills */}
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      {painter.skills.map((skill) => (
+                        <Badge key={skill} variant="secondary" className="text-xs">
+                          {skill}
+                        </Badge>
+                      ))}
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="w-4 h-4 text-muted-foreground" />
-                      <Badge
-                        variant={painter.availability === "Available" ? "success" : "warning"}
+
+                    {/* Footer */}
+                    <div className="flex items-center justify-between pt-4 border-t border-border">
+                      <div>
+                        <span className="text-2xl font-bold text-foreground">
+                          Rs. {painter.hourlyRate}
+                        </span>
+                        <span className="text-sm text-muted-foreground">/hr</span>
+                      </div>
+                      <Button
+                        variant="accent"
+                        size="sm"
+                        onClick={() => {
+                          setSelectedPainter(painter);
+                          setIsBookingOpen(true);
+                        }}
                       >
-                        {painter.availability}
-                      </Badge>
+                        Book Now
+                      </Button>
                     </div>
-                  </div>
-
-                  {/* Skills */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {painter.skills.map((skill) => (
-                      <Badge key={skill} variant="secondary" className="text-xs">
-                        {skill}
-                      </Badge>
-                    ))}
-                  </div>
-
-                  {/* Footer */}
-                  <div className="flex items-center justify-between pt-4 border-t border-border">
-                    <div>
-                      <span className="text-2xl font-bold text-foreground">
-                        ${painter.hourlyRate}
-                      </span>
-                      <span className="text-sm text-muted-foreground">/hr</span>
-                    </div>
-                    <Button
-                      variant="accent"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedPainter(painter);
-                        setIsBookingOpen(true);
-                      }}
-                    >
-                      Book Now
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </div>
+        )}
 
         {selectedPainter && (
           <BookingDialog
@@ -160,19 +172,21 @@ export function PaintersSection() {
         )}
 
         {/* CTA */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="text-center"
-        >
-          <Button variant="outline" size="lg" asChild>
-            <Link to="/painters" className="gap-2">
-              View All Painters
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Button>
-        </motion.div>
+        {painters.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center"
+          >
+            <Button variant="outline" size="lg" asChild>
+              <Link to="/painters" className="gap-2">
+                View All Painters
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </Button>
+          </motion.div>
+        )}
       </div>
     </section>
   );

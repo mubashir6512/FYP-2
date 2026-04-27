@@ -76,7 +76,7 @@ export default function DealerDashboard() {
   const stats = [
     {
       title: "Total Revenue",
-      value: `₹${(data?.totalRevenue || 0).toFixed(0)}`,
+      value: `Rs. ${(data?.totalRevenue || 0).toFixed(0)}`,
       icon: DollarSign,
     },
     {
@@ -98,15 +98,15 @@ export default function DealerDashboard() {
     },
   ];
 
-  const recentOrders = (data?.orders || []).map((o) => ({
-    id: o.order_number,
-    customer: o.customer_name || "Walk-in",
+  const recentOrders = (data?.orders || []).slice(0, 8).map((o: any) => ({
+    id: o.orderNumber,
+    customer: o.customerName || "Walk-in",
     status: (
       <Badge variant={o.status === "completed" ? "success" : "warning"}>
         {o.status}
       </Badge>
     ),
-    total: `₹${Number(o.total).toFixed(2)}`,
+    total: `Rs. ${Number(o.total).toFixed(2)}`,
   }));
 
   const todayOrders = (data?.orders || []).filter((o: any) => {
@@ -124,7 +124,7 @@ export default function DealerDashboard() {
   return (
     <DashboardLayout role="dealer">
       <PageHeader
-        title="Dealer Dashboard"
+        title="Company Dashboard"
         description="Manage your products, orders, and inventory."
       >
         <div className="flex gap-2">
@@ -157,7 +157,7 @@ export default function DealerDashboard() {
               <span className="text-sm text-muted-foreground">Today's Sales</span>
               <TrendingUp className="w-4 h-4 text-success" />
             </div>
-            <p className="text-2xl font-bold text-foreground">₹{todayRevenue.toFixed(0)}</p>
+            <p className="text-2xl font-bold text-foreground">Rs. {todayRevenue.toFixed(0)}</p>
             <p className="text-xs text-muted-foreground mt-1">{todayOrders.length} orders</p>
           </CardContent>
         </Card>
@@ -168,7 +168,7 @@ export default function DealerDashboard() {
               <DollarSign className="w-4 h-4 text-info" />
             </div>
             <p className="text-2xl font-bold text-foreground">
-              ₹{data?.orders?.length ? (data.totalRevenue / data.orders.length).toFixed(0) : 0}
+              Rs. {data?.orders?.length ? (data.totalRevenue / data.orders.length).toFixed(0) : 0}
             </p>
             <p className="text-xs text-success mt-1">+8% from last week</p>
           </CardContent>
@@ -180,7 +180,7 @@ export default function DealerDashboard() {
               <Package className="w-4 h-4 text-warning" />
             </div>
             <p className="text-2xl font-bold text-foreground">
-              ₹{(data?.products || []).reduce((s: number, p: any) => s + (Number(p.price) * p.stockQuantity), 0).toFixed(0)}
+              Rs. {(data?.products || []).reduce((s: number, p: any) => s + (Number(p.price) * p.stockQuantity), 0).toFixed(0)}
             </p>
             <p className="text-xs text-muted-foreground mt-1">{data?.products?.length || 0} products</p>
           </CardContent>
@@ -309,7 +309,7 @@ export default function DealerDashboard() {
                 </p>
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-muted-foreground">Stock: {product.stockQuantity}</span>
-                  <span className="font-semibold text-accent">₹{product.price}</span>
+                  <span className="font-semibold text-accent">Rs. {product.price}</span>
                 </div>
               </div>
             ))}

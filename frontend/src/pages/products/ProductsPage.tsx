@@ -6,19 +6,30 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Star, ShoppingCart, Heart, Search, Filter, Loader2, Package } from "lucide-react";
+import { Star, ShoppingCart, Heart, Search, Filter, Loader2, Package, Store, MapPin } from "lucide-react";
 import { api } from "@/lib/api";
 import { useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useCart } from "@/contexts/CartContext";
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedBrand, setSelectedBrand] = useState("all");
+  const [selectedProduct, setSelectedProduct] = useState<any>(null);
+  const { addToCart } = useCart();
+  const [wishlist, setWishlist] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem("paintverse_wishlist");
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
 
-  const { data: products = [], isLoading } = useQuery({
+  const { data: products = [] as any[], isLoading } = useQuery({
     queryKey: ["all-products"],
     queryFn: async () => {
-      return api("/products");
+      const data = await api("/products");
+      return data as any[];
     },
   });
 
@@ -34,7 +45,24 @@ export default function ProductsPage() {
 
   // Get unique brands and categories
   const brands = ["all", ...new Set(products.map((p: any) => p.brand).filter(Boolean))];
-  const categories = ["all", "interior", "exterior"];
+  const categories = ["all", "interior", "exterior", "enamel", "primer", "specialty"];
+
+  const toggleWishlist = (id: string) => {
+    setWishlist(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+        toast.info("Removed from wishlist");
+      } else {
+        next.add(id);
+        toast.success("Added to wishlist");
+      }
+      localStorage.setItem("paintverse_wishlist", JSON.stringify(Array.from(next)));
+      return next;
+    });
+  };
+
+  // Removed local addToCart as we're using the one from CartContext
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,52 +87,65 @@ export default function ProductsPage() {
         </div>
 
         {/* Filters Section */}
-        <div className="bg-muted/30 border-b border-border">
-          <div className="container mx-auto px-4 py-6">
-            <div className="flex flex-col md:flex-row gap-4">
+        <div className="bg-muted/30 border-b border-border sticky top-[64px] z-30 backdrop-blur-md">
+          <div className="container mx-auto px-4 py-4">
+            <div className="flex flex-col lg:flex-row gap-4 items-center">
               {/* Search */}
-              <div className="flex-1 relative">
+              <div className="w-full lg:flex-1 relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <Input
                   placeholder="Search by name, brand, or description..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10"
+                  className="pl-10 bg-background"
                 />
               </div>
 
-              {/* Category Filter */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border bg-background text-foreground"
-              >
-                <option value="all">All Categories</option>
-                {categories.slice(1).map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat.charAt(0).toUpperCase() + cat.slice(1)}
-                  </option>
-                ))}
-              </select>
+              <div className="flex flex-wrap gap-2 w-full lg:w-auto">
+                {/* Category Filter */}
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="flex-1 lg:flex-none px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm"
+                >
+                  <option value="all">All Categories</option>
+                  {categories.slice(1).map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat.charAt(0).toUpperCase() + cat.slice(1)}
+                    </option>
+                  ))}
+                </select>
 
-              {/* Brand Filter */}
-              <select
-                value={selectedBrand}
-                onChange={(e) => setSelectedBrand(e.target.value)}
-                className="px-4 py-2 rounded-lg border border-border bg-background text-foreground"
-              >
-                <option value="all">All Brands</option>
-                {brands.slice(1).map((brand) => (
-                  <option key={brand} value={brand}>
-                    {brand}
-                  </option>
-                ))}
-              </select>
+                {/* Brand Filter */}
+                <select
+                  value={selectedBrand}
+                  onChange={(e) => setSelectedBrand(e.target.value)}
+                  className="flex-1 lg:flex-none px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm"
+                >
+                  <option value="all">All Brands</option>
+                  {brands.slice(1).map((brand: any) => (
+                    <option key={brand} value={brand}>
+                      {brand}
+                    </option>
+                  ))}
+                </select>
+
+                <Button variant="outline" size="sm" onClick={() => {
+                  setSearchQuery("");
+                  setSelectedCategory("all");
+                  setSelectedBrand("all");
+                }} className="gap-2">
+                  <Filter className="w-4 h-4" />
+                  Reset
+                </Button>
+              </div>
             </div>
 
             {/* Results Count */}
-            <div className="mt-4 text-sm text-muted-foreground">
-              Showing {filteredProducts.length} of {products.length} products
+            <div className="mt-3 flex items-center justify-between">
+              <span className="text-sm text-muted-foreground">
+                Showing <span className="font-medium text-foreground">{filteredProducts.length}</span> of {products.length} products
+              </span>
             </div>
           </div>
         </div>
@@ -153,15 +194,28 @@ export default function ProductsPage() {
                       />
 
                       {/* Overlay Actions */}
-                      <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
-                        <Button variant="secondary" size="sm" className="shadow-lg">
+                      <div className="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="shadow-xl scale-90 group-hover:scale-100 transition-transform"
+                          onClick={() => setSelectedProduct(product)}
+                        >
                           Quick View
                         </Button>
                       </div>
 
                       {/* Wishlist */}
-                      <button className="absolute top-3 right-3 w-9 h-9 rounded-full bg-background/90 backdrop-blur-sm flex items-center justify-center hover:bg-background transition-colors opacity-0 group-hover:opacity-100">
-                        <Heart className="w-4 h-4 text-foreground" />
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWishlist(product.id);
+                        }}
+                        className={`absolute top-3 right-3 w-9 h-9 rounded-full backdrop-blur-md flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 shadow-sm ${
+                          wishlist.has(product.id) ? "bg-accent text-white opacity-100" : "bg-background/90 text-foreground hover:bg-background"
+                        }`}
+                      >
+                        <Heart className={`w-4 h-4 ${wishlist.has(product.id) ? "fill-current" : ""}`} />
                       </button>
 
                       {/* Stock Badge */}
@@ -235,7 +289,7 @@ export default function ProductsPage() {
                       <div className="flex items-center justify-between mt-auto pt-3 border-t border-border">
                         <div>
                           <span className="text-2xl font-bold text-foreground">
-                            Rs {Number(product.price).toLocaleString()}
+                            Rs. {Number(product.price).toLocaleString()}
                           </span>
                           <span className="text-xs text-muted-foreground ml-1">
                             /{product.unit || "L"}
@@ -245,6 +299,10 @@ export default function ProductsPage() {
                           size="sm" 
                           variant="accent"
                           disabled={product.stockQuantity === 0}
+                          onClick={() => {
+                            console.log("Add to Cart clicked for product:", product.id);
+                            addToCart(product);
+                          }}
                         >
                           <ShoppingCart className="w-4 h-4 mr-1" />
                           Add
@@ -258,6 +316,120 @@ export default function ProductsPage() {
           )}
         </div>
       </main>
+
+      {/* Quick View Modal */}
+      <Dialog open={!!selectedProduct} onOpenChange={() => setSelectedProduct(null)}>
+        <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background border-border">
+          {selectedProduct && (
+            <div className="grid md:grid-cols-2">
+              <div 
+                className="aspect-square md:aspect-auto min-h-[300px]"
+                style={{
+                  background: selectedProduct.imageUrl || `linear-gradient(135deg, ${selectedProduct.colorHex}dd 0%, ${selectedProduct.colorHex} 100%)`
+                }}
+              />
+              <div className="p-8 flex flex-col">
+                <div className="mb-6">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge variant="secondary" className="capitalize">{selectedProduct.category}</Badge>
+                    <span className="text-xs text-muted-foreground font-mono">{selectedProduct.sku}</span>
+                  </div>
+                  <h2 className="text-3xl font-bold text-foreground mb-2">{selectedProduct.name}</h2>
+                  <p className="text-lg font-medium text-muted-foreground">{selectedProduct.brand}</p>
+                </div>
+
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="flex items-center gap-1">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} className="w-4 h-4 fill-warning text-warning" />
+                    ))}
+                    <span className="ml-2 font-medium">4.8</span>
+                  </div>
+                  <span className="text-muted-foreground">(24 reviews)</span>
+                </div>
+
+                <div className="mb-8">
+                  <h4 className="text-sm font-semibold text-foreground mb-2">Description</h4>
+                  <p className="text-muted-foreground leading-relaxed">
+                    {selectedProduct.description || "A premium quality paint offering excellent coverage and a durable finish. Perfect for high-traffic areas and long-lasting beauty."}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 mb-8">
+                  <div className="p-3 rounded-xl border border-border bg-muted/30">
+                    <p className="text-xs text-muted-foreground mb-1">Color Code</p>
+                    <div className="flex items-center gap-2">
+                      <div className="w-4 h-4 rounded-full border" style={{ backgroundColor: selectedProduct.colorHex }} />
+                      <span className="text-sm font-medium uppercase">{selectedProduct.colorHex}</span>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-xl border border-border bg-muted/30">
+                    <p className="text-xs text-muted-foreground mb-1">Unit Size</p>
+                    <p className="text-sm font-medium">{selectedProduct.unit || "Litre"}</p>
+                  </div>
+                </div>
+
+                {/* Sold By Section */}
+                <div className="p-4 rounded-xl border border-accent/20 bg-accent/5 mb-8">
+                  <h4 className="text-xs font-semibold text-accent uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <Store className="w-3 h-3" /> Sold By
+                  </h4>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-bold text-foreground">
+                        {selectedProduct.dealer?.profile?.businessName || selectedProduct.dealer?.profile?.fullName || "PaintVerse Dealer"}
+                      </p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
+                        <MapPin className="w-3 h-3" /> {selectedProduct.dealer?.profile?.city || "Pakistan"}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="bg-background">Verified Seller</Badge>
+                  </div>
+                </div>
+
+                <div className="mt-auto space-y-4">
+                  <div className="flex items-end justify-between">
+                    <div>
+                      <p className="text-xs text-muted-foreground mb-1">Price</p>
+                      <p className="text-4xl font-bold text-foreground">
+                        Rs. {Number(selectedProduct.price).toLocaleString()}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <Badge variant={selectedProduct.stockQuantity > 0 ? "success" : "destructive"}>
+                        {selectedProduct.stockQuantity > 0 ? `${selectedProduct.stockQuantity} in stock` : "Out of stock"}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button 
+                      className="flex-1 h-12 text-lg" 
+                      variant="accent"
+                      disabled={selectedProduct.stockQuantity === 0}
+                      onClick={() => {
+                        console.log("Quick View: Add to Cart clicked for product:", selectedProduct.id);
+                        addToCart(selectedProduct);
+                      }}
+                    >
+                      <ShoppingCart className="w-5 h-5 mr-2" />
+                      Add to Cart
+                    </Button>
+                    <Button 
+                      variant="outline" 
+                      size="icon" 
+                      className="h-12 w-12"
+                      onClick={() => toggleWishlist(selectedProduct.id)}
+                    >
+                      <Heart className={`w-5 h-5 ${wishlist.has(selectedProduct.id) ? "fill-accent text-accent" : ""}`} />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
       <Footer />
     </div>
   );

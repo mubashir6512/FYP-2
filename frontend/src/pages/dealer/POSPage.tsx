@@ -196,24 +196,24 @@ export default function POSPage() {
                 {showReceipt.items.map((item: CartItem) => (
                   <div key={item.id} className="flex justify-between text-sm">
                     <span>{item.name} × {item.quantity}</span>
-                    <span>₹{(item.price * item.quantity).toFixed(2)}</span>
+                    <span>Rs. {(item.price * item.quantity).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
               <div className="border-t border-border pt-3 space-y-1">
                 <div className="flex justify-between text-sm">
-                  <span>Subtotal</span><span>₹{showReceipt.subtotal.toFixed(2)}</span>
+                  <span>Subtotal</span><span>Rs. {showReceipt.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span>Tax (18%)</span><span>₹{showReceipt.taxAmount.toFixed(2)}</span>
+                  <span>Tax (18%)</span><span>Rs. {showReceipt.taxAmount.toFixed(2)}</span>
                 </div>
                 {showReceipt.discount > 0 && (
                   <div className="flex justify-between text-sm text-success">
-                    <span>Discount</span><span>-₹{showReceipt.discount.toFixed(2)}</span>
+                    <span>Discount</span><span>-Rs. {showReceipt.discount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-bold text-lg border-t border-border pt-2">
-                  <span>Total</span><span>₹{showReceipt.total.toFixed(2)}</span>
+                  <span>Total</span><span>Rs. {showReceipt.total.toFixed(2)}</span>
                 </div>
               </div>
               <Button variant="accent" className="w-full" onClick={() => window.print()}>
@@ -265,7 +265,7 @@ export default function POSPage() {
                   </p>
                   <p className="text-xs text-muted-foreground mt-0.5">{product.sku}</p>
                   <div className="flex items-center justify-between mt-2">
-                    <span className="font-bold text-accent">₹{product.price}</span>
+                    <span className="font-bold text-accent">Rs. {product.price}</span>
                     <Badge variant={product.stockQuantity <= 10 ? "warning" : "secondary"} className="text-xs">
                       {product.stockQuantity} left
                     </Badge>
@@ -323,7 +323,7 @@ export default function POSPage() {
                     >
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">₹{item.price} × {item.quantity}</p>
+                        <p className="text-xs text-muted-foreground">Rs. {item.price} × {item.quantity}</p>
                       </div>
                       <div className="flex items-center gap-1">
                         <Button
@@ -353,7 +353,7 @@ export default function POSPage() {
                         </Button>
                       </div>
                       <p className="text-sm font-medium w-16 text-right">
-                        ₹{(item.price * item.quantity).toFixed(2)}
+                        Rs. {(item.price * item.quantity).toFixed(2)}
                       </p>
                     </div>
                   ))}
@@ -377,21 +377,21 @@ export default function POSPage() {
               <div className="border-t border-border pt-3 space-y-1.5">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
-                  <span>₹{subtotal.toFixed(2)}</span>
+                  <span>Rs. {subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax (18%)</span>
-                  <span>₹{taxAmount.toFixed(2)}</span>
+                  <span>Rs. {taxAmount.toFixed(2)}</span>
                 </div>
                 {discount > 0 && (
                   <div className="flex justify-between text-sm text-success">
                     <span>Discount</span>
-                    <span>-₹{discount.toFixed(2)}</span>
+                    <span>-Rs. {discount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between font-bold text-lg pt-2 border-t border-border">
                   <span>Total</span>
-                  <span className="text-accent">₹{total.toFixed(2)}</span>
+                  <span className="text-accent">Rs. {total.toFixed(2)}</span>
                 </div>
               </div>
 

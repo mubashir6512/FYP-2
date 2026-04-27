@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import {
   DollarSign,
   ShoppingCart,
+  ShoppingBag,
   TrendingUp,
   Package,
   Loader2,
@@ -83,17 +84,17 @@ export default function SalesAnalyticsPage() {
   }
 
   const stats = [
-    { title: "Total Revenue", value: `₹${(data?.totalRevenue || 0).toFixed(0)}`, icon: DollarSign, change: undefined },
-    { title: "Total Orders", value: data?.totalOrders || 0, icon: ShoppingCart },
-    { title: "Avg. Order", value: `₹${(data?.avgOrder || 0).toFixed(0)}`, icon: TrendingUp },
-    { title: "Products Sold", value: data?.totalProducts || 0, icon: Package, iconColor: "text-info" },
+    { title: "Total Revenue", value: `Rs. ${(data?.totalRevenue || 0).toFixed(0)}`, icon: DollarSign, change: undefined },
+    { title: "Active Orders", value: data?.totalOrders || 0, icon: ShoppingBag, change: { value: 12, positive: true } },
+    { title: "Avg. Order", value: `Rs. ${(data?.avgOrder || 0).toFixed(0)}`, icon: TrendingUp },
+    { title: "Products Sold", value: data?.totalProducts || 0, icon: Package, iconColor: "text-info" as const },
   ];
 
   return (
     <DashboardLayout role={isAdmin ? "admin" : "dealer"}>
       <PageHeader
         title={isAdmin ? "Platform Sales Analytics" : "Sales Analytics"}
-        description={isAdmin ? "Overview of all dealer transactions." : "Track your POS performance."}
+        description={isAdmin ? "Overview of all company transactions." : "Track your POS performance."}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -157,7 +158,7 @@ export default function SalesAnalyticsPage() {
                     <div key={p.name} className="flex items-center gap-2">
                       <div className="w-3 h-3 rounded-full" style={{ backgroundColor: COLORS[i % COLORS.length] }} />
                       <span className="text-sm text-foreground flex-1 truncate">{p.name}</span>
-                      <span className="text-sm font-medium">₹{p.revenue.toFixed(0)}</span>
+                      <span className="text-sm font-medium">Rs. {p.revenue.toFixed(0)}</span>
                     </div>
                   ))}
                 </div>

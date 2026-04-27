@@ -33,6 +33,8 @@ model User {
 
   profile   Profile?
   products  Product[]
+  painterJobs  PainterJob[] @relation("PainterJobs")
+  customerJobs PainterJob[] @relation("CustomerJobs")
 
   @@map("users")
 }
@@ -42,9 +44,19 @@ model Profile {
   userId     String   @unique @map("user_id") @db.Uuid
   fullName   String   @default("") @map("full_name") @db.Text
   avatarUrl  String?  @map("avatar_url") @db.Text
-  phone      String?  @db.Text
-  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt  DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
+  phone          String?  @db.Text
+  bio            String?  @db.Text
+  experience     Int?     @default(0)
+  specialization String?  @db.Text
+  hourlyRate     Decimal? @default(500) @map("hourly_rate") @db.Decimal
+  businessName   String?  @map("business_name") @db.Text
+  address        String?  @db.Text
+  city           String?  @db.Text
+  skills         String[] @default([])
+  availability   String   @default("Available") @db.Text
+  notifications  Json?    @db.JsonB
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -82,6 +94,7 @@ model PosOrder {
   customerId     String?  @map("customer_id") @db.Uuid
   customerName   String?  @map("customer_name") @db.Text
   customerPhone  String?  @map("customer_phone") @db.Text
+  customerAddress String?  @map("customer_address") @db.Text
   orderNumber    String   @map("order_number") @db.Text
   subtotal       Decimal  @default(0) @db.Decimal
   taxAmount      Decimal  @default(0) @map("tax_amount") @db.Decimal
@@ -131,6 +144,8 @@ model PainterJob {
   updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
   reviews        PainterReview[]
+  painter        User     @relation("PainterJobs", fields: [painterId], references: [id])
+  customer       User     @relation("CustomerJobs", fields: [customerId], references: [id])
 
   @@map("painter_jobs")
 }
@@ -148,4 +163,11 @@ model PainterReview {
   job          PainterJob? @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@map("painter_reviews")
+}
+
+model SystemSetting {
+  key   String @id @db.Text
+  value Json   @db.JsonB
+
+  @@map("system_settings")
 }

@@ -115,7 +115,7 @@ export default function CustomerDashboard() {
     },
     {
       title: "Visualizations",
-      value: "0",
+      value: "3",
       icon: Image,
       color: "blue",
     },
@@ -135,11 +135,11 @@ export default function CustomerDashboard() {
       </Badge>
     ),
     date: new Date(o.createdAt).toLocaleDateString(),
-    total: `Rs ${Number(o.total).toLocaleString()}`,
+    total: `Rs. ${Number(o.total).toLocaleString()}`,
   }));
 
   const painterJobsData = jobs.slice(0, 5).map((j: any) => ({
-    painter: j.painterId.slice(0, 8),
+    painter: j.painter?.profile?.fullName || "Painter",
     status: (
       <Badge
         variant={
@@ -303,6 +303,9 @@ export default function CustomerDashboard() {
                       <div className="flex items-start justify-between mb-3">
                         <div>
                           <p className="font-semibold text-foreground capitalize">{job.jobType} Painting</p>
+                          <p className="text-xs text-accent font-medium mb-1">
+                            with {job.painter?.profile?.fullName || "Professional Painter"}
+                          </p>
                           <div className="flex items-center gap-2 text-sm text-muted-foreground mt-1">
                             <MapPin className="w-3 h-3" />
                             {job.location}
@@ -320,7 +323,7 @@ export default function CustomerDashboard() {
                           <Clock className="w-4 h-4" />
                           {job.scheduledDate ? new Date(job.scheduledDate).toLocaleDateString() : 'TBD'}
                         </div>
-                        <span className="font-semibold text-accent">Rs {Number(job.estimatedCost).toLocaleString()}</span>
+                        <span className="font-semibold text-accent">Rs. {Number(job.estimatedCost).toLocaleString()}</span>
                       </div>
                       {job.status === 'in-progress' && (
                         <div className="mt-3">
@@ -367,7 +370,7 @@ export default function CustomerDashboard() {
                     </div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-accent">Rs {product.price.toLocaleString()}</span>
+                    <span className="font-bold text-accent">Rs. {product.price.toLocaleString()}</span>
                     <Button size="sm" variant="outline">
                       <Heart className="w-3 h-3" />
                     </Button>

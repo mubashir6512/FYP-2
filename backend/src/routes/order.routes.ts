@@ -4,7 +4,7 @@ import { authenticate, authorize } from '../middleware/auth.js';
 
 const router = Router();
 
-router.post('/', authenticate, authorize(['dealer']), createOrder);
-router.get('/', authenticate, authorize(['dealer', 'admin']), getOrders);
+router.post('/', authenticate, authorize(['dealer', 'customer']), createOrder);
+router.get('/', authenticate, authorize(['dealer', 'admin', 'customer']), getOrders);
 
 export default router;

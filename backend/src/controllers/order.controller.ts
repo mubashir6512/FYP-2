@@ -4,8 +4,9 @@ import { prisma } from '../index.js';
 import type { AuthRequest } from '../middleware/auth.js';
 
 export const createOrder = async (req: AuthRequest, res: Response) => {
-    const dealerId = req.user?.id;
-    if (!dealerId) return res.status(401).json({ message: 'Unauthorized' });
+    const userId = req.user?.id;
+    const role = req.user?.role;
+    if (!userId) return res.status(401).json({ message: 'Unauthorized' });
 
     const { items, ...orderData } = req.body;
 
@@ -20,11 +21,14 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
             const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
             const orderNumber = `ORD-${date}-${random}`;
 
-            // 2. Validate stock and reduce it for each product
+            let finalDealerId = role === 'dealer' ? userId : null;
+            let finalCustomerId = role === 'customer' ? userId : (orderData.customerId || null);
+
+            // 2. Validate stock and find dealer if customer
             for (const item of items) {
                 const product = await tx.product.findUnique({
                     where: { id: item.productId },
-                    select: { stockQuantity: true, name: true }
+                    select: { stockQuantity: true, name: true, dealerId: true }
                 });
 
                 if (!product) {
@@ -33,6 +37,10 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
                 if (product.stockQuantity < item.quantity) {
                     throw new Error(`Insufficient stock for ${product.name}. Available: ${product.stockQuantity}, Requested: ${item.quantity}`);
+                }
+
+                if (role === 'customer' && !finalDealerId) {
+                    finalDealerId = product.dealerId;
                 }
 
                 await tx.product.update({
@@ -45,12 +53,19 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
                 });
             }
 
+            if (!finalDealerId) {
+                // If still no dealerId (e.g. customer bought nothing?), throw error
+                // but items.length > 0 check happened above.
+                throw new Error("Unable to determine dealer for this order");
+            }
+
             // 3. Create the order
             const newOrder = await tx.posOrder.create({
                 data: {
                     ...orderData,
                     orderNumber,
-                    dealerId,
+                    dealerId: finalDealerId,
+                    customerId: finalCustomerId,
                     items: {
                         create: items.map((item: any) => ({
                             productId: item.productId,
@@ -69,7 +84,7 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
 
         res.status(201).json(order);
     } catch (error: any) {
-        console.error('POS Order Error:', error);
+        console.error('Order Error:', error);
         res.status(400).json({ message: error.message || 'Error creating order' });
     }
 };

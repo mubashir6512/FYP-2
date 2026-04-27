@@ -101,7 +101,7 @@ export default function AdminDashboard() {
   const stats = [
     {
       title: "Total Revenue",
-      value: `₹${platformRevenue.toLocaleString()}`,
+      value: `Rs. ${platformRevenue.toLocaleString()}`,
       icon: DollarSign,
       change: { value: 12, positive: true },
     },
@@ -128,7 +128,7 @@ export default function AdminDashboard() {
   const platformMetrics = [
     {
       label: "Monthly Revenue",
-      value: `₹${(data?.monthlyRevenue || 0).toLocaleString()}`,
+      value: `Rs. ${(data?.monthlyRevenue || 0).toLocaleString()}`,
       change: "+18%",
       positive: true,
       icon: DollarSign,
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
       icon: ShoppingCart,
     },
     {
-      label: "Active Dealers",
+      label: "Active Companies",
       value: Math.floor((data?.products || []).length / 4) || 1,
       change: "+5%",
       positive: true,
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
 
   const recentActivity = [
     { type: "order", message: "New order #ORD-12345 placed", time: "2 min ago", icon: ShoppingCart },
-    { type: "user", message: "New dealer registered: Modern Paints", time: "15 min ago", icon: UserCheck },
+    { type: "user", message: "New company registered: Modern Paints", time: "15 min ago", icon: UserCheck },
     { type: "product", message: "5 new products added to catalog", time: "1 hour ago", icon: Package },
     { type: "painter", message: "Painter completed job #JOB-789", time: "2 hours ago", icon: Briefcase },
   ];
@@ -322,7 +322,7 @@ export default function AdminDashboard() {
           <CardHeader>
             <CardTitle className="text-lg flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-success" />
-              Top Dealers by Products
+              Top Companies by Products
             </CardTitle>
           </CardHeader>
           <CardContent>

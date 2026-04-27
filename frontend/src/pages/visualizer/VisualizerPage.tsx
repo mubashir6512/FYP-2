@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
+import { api } from "@/lib/api";
+import { useQuery } from "@tanstack/react-query";
 import {
   Upload,
   Paintbrush,
@@ -64,7 +66,30 @@ export default function VisualizerPage() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<RoomAnalysis | null>(null);
-  const [selectedColor, setSelectedColor] = useState(PAINT_COLORS[0]);
+
+  // Fetch real paint products from backend
+  const { data: dbProducts = [] } = useQuery({
+    queryKey: ["visualizer-paints"],
+    queryFn: () => api("/products?category=paint"),
+  });
+
+  const availableColors = dbProducts.length > 0 
+    ? dbProducts.map((p: any) => ({
+        name: p.name,
+        hex: p.colorHex || "#888888",
+        category: p.brand || "Paint",
+        id: p.id
+      }))
+    : PAINT_COLORS;
+
+  const [selectedColor, setSelectedColor] = useState(availableColors[0]);
+  
+  // Update selected color if availableColors changes and currently none selected
+  useEffect(() => {
+    if (availableColors.length > 0 && (!selectedColor || !availableColors.find(c => c.hex === selectedColor.hex))) {
+      setSelectedColor(availableColors[0]);
+    }
+  }, [availableColors]);
   const [customHex, setCustomHex] = useState("#");
   const [customName, setCustomName] = useState("Custom Color");
   const [visualizedImage, setVisualizedImage] = useState<string | null>(null);
@@ -445,10 +470,10 @@ export default function VisualizerPage() {
                     <h2 className="font-display text-2xl font-bold text-foreground mb-4">
                       Choose Your Paint Color
                     </h2>
-                    <div className="grid grid-cols-4 gap-3 mb-6">
-                      {PAINT_COLORS.map((color) => (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3 mb-6">
+                      {availableColors.map((color: any) => (
                         <button
-                          key={color.hex}
+                          key={color.hex + (color.id || color.name)}
                           onClick={() => setSelectedColor(color)}
                           className={`paint-swatch group relative ${
                             selectedColor.hex === color.hex ? "selected" : ""

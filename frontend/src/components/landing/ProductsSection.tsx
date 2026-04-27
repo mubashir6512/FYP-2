@@ -119,7 +119,7 @@ export function ProductsSection() {
                   {/* Price & CTA */}
                   <div className="flex items-center justify-between">
                     <span className="text-xl font-bold text-foreground">
-                      ₹{Number(product.price).toFixed(0)}
+                      Rs. {Number(product.price).toFixed(0)}
                     </span>
                     <Button size="sm" variant="accent">
                       <ShoppingCart className="w-4 h-4 mr-1" />

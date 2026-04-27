@@ -42,7 +42,7 @@ interface NavItem {
 
 const navigationByRole: Record<UserRole, NavItem[]> = {
   customer: [
-    { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Dashboard", href: "/dashboard/home", icon: LayoutDashboard },
     { name: "Visualizer", href: "/dashboard/visualizer", icon: Image },
     { name: "Orders", href: "/dashboard/orders", icon: ShoppingCart },
     { name: "Wishlist", href: "/dashboard/wishlist", icon: Heart },
@@ -69,7 +69,7 @@ const navigationByRole: Record<UserRole, NavItem[]> = {
   admin: [
     { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
     { name: "Users", href: "/admin/users", icon: Users },
-    { name: "Dealers", href: "/admin/dealers", icon: Package },
+    { name: "Companies", href: "/admin/dealers", icon: Package },
     { name: "Painters", href: "/admin/painters", icon: Briefcase },
     { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
     { name: "Reports", href: "/admin/reports", icon: FileText },
@@ -80,7 +80,7 @@ const navigationByRole: Record<UserRole, NavItem[]> = {
 
 const roleLabels: Record<UserRole, string> = {
   customer: "Customer",
-  dealer: "Dealer",
+  dealer: "Company",
   painter: "Painter",
   admin: "Admin",
 };

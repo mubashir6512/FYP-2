@@ -304,8 +304,8 @@ export default function InventoryPage() {
       ) : (
         <div className="space-y-3">
           {filtered.map((product: any) => {
-            const isLow = product.stock_quantity > 0 && product.stock_quantity <= product.low_stock_threshold;
-            const isOut = product.stock_quantity <= 0;
+            const isLow = product.stockQuantity > 0 && product.stockQuantity <= product.lowStockThreshold;
+            const isOut = product.stockQuantity <= 0;
             return (
               <Card key={product.id} className={`${isOut ? "border-destructive/30" : isLow ? "border-warning/30" : ""}`}>
                 <CardContent className="p-4">
@@ -322,7 +322,7 @@ export default function InventoryPage() {
                       )}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-foreground truncate">{product.name}</h3>
-                        <p className="text-xs text-muted-foreground">{product.sku || "No SKU"} · {product.category} · ₹{product.price}/{product.unit}</p>
+                        <p className="text-xs text-muted-foreground">{product.sku || "No SKU"} · {product.category} · Rs. {product.price}/{product.unit}</p>
                       </div>
                     </div>
 

@@ -52,7 +52,7 @@ export function BookingDialog({ painter, open, onOpenChange }: BookingDialogProp
                     ...formData,
                     painterId: painter.id,
                     customerName: "", // Will be handled by backend from user profile
-                    estimatedCost: painter.hourlyRate * 8, // Default 8 hours estimate
+                    estimatedCost: (painter.hourlyRate || 500) * 8, // Default 8 hours estimate
                 }),
             });
 

@@ -16,6 +16,16 @@ interface Profile {
   fullName: string;
   avatarUrl: string | null;
   phone: string | null;
+  bio?: string | null;
+  experience?: number | null;
+  specialization?: string | null;
+  hourlyRate?: number | string | null;
+  skills?: string[] | null;
+  availability?: string | null;
+  businessName?: string | null;
+  address?: string | null;
+  city?: string | null;
+  notifications?: any | null;
 }
 
 interface AuthContextType {
@@ -26,6 +36,7 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string, role: AppRole) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -45,19 +56,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        // We could add a /me endpoint, but for now we'll assume the user is valid if the token exists
-        // and fetch fresh user data if needed. In a real app, /api/auth/me would be better.
-        const storedUser = localStorage.getItem('user');
-        if (storedUser) {
-          const parsed = JSON.parse(storedUser);
-          setUser(parsed);
-          setProfile(parsed.profile);
-          setRole(parsed.role);
-        }
+        const data = await api('/auth/me');
+        setUser(data);
+        setProfile(data.profile);
+        setRole(data.role);
+        localStorage.setItem('user', JSON.stringify(data));
       } catch (error) {
         console.error("Auth initialization error", error);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        setUser(null);
+        setProfile(null);
+        setRole(null);
       } finally {
         setLoading(false);
       }
@@ -114,8 +124,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setRole(null);
   };
 
+  const refreshProfile = async () => {
+    try {
+      const data = await api('/auth/me');
+      setUser(data);
+      setProfile(data.profile);
+      setRole(data.role);
+      localStorage.setItem('user', JSON.stringify(data));
+    } catch (error) {
+      console.error("Failed to refresh profile", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, profile, role, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, profile, role, loading, signUp, signIn, signOut, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

@@ -29,7 +29,7 @@ const services = [
         link: "/painters"
     },
     {
-        title: "Dealer Procurement",
+        title: "Company Procurement",
         description: "Streamlined inventory management and POS solutions for paint retailers and wholesalers.",
         icon: ShoppingBag,
         color: "bg-green-500/10 text-green-500",

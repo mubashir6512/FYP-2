@@ -6,6 +6,8 @@ import authRoutes from './routes/auth.routes.js';
 import productRoutes from './routes/product.routes.js';
 import orderRoutes from './routes/order.routes.js';
 import painterRoutes from './routes/painter.routes.js';
+import adminRoutes from './routes/admin.routes.js';
+import systemRoutes from './routes/system.routes.js';
 
 dotenv.config();
 
@@ -20,6 +22,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/painters', painterRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/system', systemRoutes);
 
 app.get('/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });

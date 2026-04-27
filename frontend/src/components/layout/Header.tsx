@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -36,7 +37,7 @@ export function Header() {
       return [
         ...baseLinks,
         { name: "Find a Painter", href: "/painters" },
-        { name: "Dashboard", href: "/dashboard" },
+        { name: "Dashboard", href: "/dashboard/home" },
         { name: "My Orders", href: "/dashboard/orders" },
       ];
     }
@@ -45,16 +46,24 @@ export function Header() {
       return [
         ...baseLinks,
         { name: "POS", href: "/dealer/pos" },
-        { name: "Inventory", href: "/dashboard/inventory" },
-        { name: "Dashboard", href: "/dashboard" },
+        { name: "Inventory", href: "/dealer/inventory" },
+        { name: "Dashboard", href: "/dealer/dashboard" },
       ];
     }
 
     if (user.role === "painter") {
       return [
         ...baseLinks,
-        { name: "Jobs", href: "/dashboard/jobs" },
-        { name: "Dashboard", href: "/dashboard" },
+        { name: "Jobs", href: "/painter/jobs" },
+        { name: "Dashboard", href: "/painter/dashboard" },
+      ];
+    }
+
+    if (user.role === "admin") {
+      return [
+        ...baseLinks,
+        { name: "Dashboard", href: "/admin/dashboard" },
+        { name: "Users", href: "/admin/users" },
       ];
     }
 
@@ -93,6 +102,7 @@ export function Header() {
 
           {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
+            <CartDrawer />
             {user ? (
               <>
                 <Button variant="ghost" size="sm" asChild className="gap-2">
@@ -118,13 +128,16 @@ export function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
-          >
-            {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          {/* Mobile Menu Button & Cart */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <CartDrawer />
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="p-2 rounded-lg hover:bg-secondary transition-colors"
+            >
+              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
+          </div>
         </div>
       </nav>
 

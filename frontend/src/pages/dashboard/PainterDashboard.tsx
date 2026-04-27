@@ -133,7 +133,7 @@ export default function PainterDashboard() {
   const stats = [
     {
       title: "Total Earnings",
-      value: `₹${(data?.totalEarnings || 0).toFixed(0)}`,
+      value: `Rs. ${(data?.totalEarnings || 0).toFixed(0)}`,
       icon: DollarSign,
       change: { value: 15, positive: true },
     },
@@ -160,7 +160,7 @@ export default function PainterDashboard() {
   const monthlyMetrics = [
     {
       label: "This Month",
-      value: `₹${(data?.monthlyEarnings || 0).toFixed(0)}`,
+      value: `Rs. ${(data?.monthlyEarnings || 0).toFixed(0)}`,
       subtext: `${data?.monthlyJobs?.length || 0} jobs`,
       icon: TrendingUp,
       color: "text-success",
@@ -314,7 +314,7 @@ export default function PainterDashboard() {
                         </div>
                         <div className="text-right">
                           <p className="text-lg font-bold text-accent">
-                            ₹{Number(job.estimatedCost).toLocaleString()}
+                            Rs. {Number(job.estimatedCost).toLocaleString()}
                           </p>
                           <p className="text-xs text-muted-foreground">
                             {job.estimatedHours}h estimated
@@ -401,7 +401,7 @@ export default function PainterDashboard() {
                     <div className="flex items-center justify-between mb-3">
                       <span className="text-xs text-muted-foreground">Estimated</span>
                       <span className="font-semibold text-accent">
-                        ₹{Number(job.estimatedCost).toLocaleString()}
+                        Rs. {Number(job.estimatedCost).toLocaleString()}
                       </span>
                     </div>
                     <Button
