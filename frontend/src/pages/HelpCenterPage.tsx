@@ -3,8 +3,10 @@ import { Footer } from "@/components/layout/Footer";
 import { motion } from "framer-motion";
 import { Search, Book, MessageCircle, FileText, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useNavigate } from "react-router-dom";
 
 export default function HelpCenterPage() {
+    const navigate = useNavigate();
     return (
         <div className="min-h-screen bg-background">
             <Header />
@@ -31,15 +33,16 @@ export default function HelpCenterPage() {
 
                     <div className="grid md:grid-cols-3 gap-6 mb-16">
                         {[
-                            { icon: Book, title: "Getting Started", desc: "Learn the basics of PaintVerse" },
-                            { icon: MessageCircle, title: "Contact Support", desc: "Get in touch with our team" },
-                            { icon: FileText, title: "Guides & Tutorials", desc: "Deep dive into our features" }
+                            { icon: Book, title: "Getting Started", desc: "Learn the basics of PaintVerse", href: "/help/getting-started" },
+                            { icon: MessageCircle, title: "Contact Support", desc: "Get in touch with our team", href: "/contact" },
+                            { icon: FileText, title: "Guides & Tutorials", desc: "Deep dive into our features", href: "/help/guides" }
                         ].map((item, i) => (
                             <motion.div 
                                 key={i}
                                 initial={{ opacity: 0, y: 20 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: i * 0.1 }}
+                                onClick={() => navigate(item.href)}
                                 className="bg-secondary/20 p-8 rounded-3xl border border-border/50 hover:bg-secondary/40 transition-colors cursor-pointer group"
                             >
                                 <div className="w-12 h-12 bg-accent/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -59,7 +62,7 @@ export default function HelpCenterPage() {
                         <p className="text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
                             Our support team is available 24/7 to assist you with any questions or issues you might have.
                         </p>
-                        <Button variant="secondary" size="lg" className="rounded-full px-8">
+                        <Button variant="secondary" size="lg" className="rounded-full px-8" onClick={() => navigate('/contact')}>
                             Contact Us Now
                         </Button>
                     </div>

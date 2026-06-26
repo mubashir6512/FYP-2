@@ -50,6 +50,8 @@ import HelpCenterPage from "./pages/HelpCenterPage";
 import ShippingInfoPage from "./pages/ShippingInfoPage";
 import ReturnsPage from "./pages/ReturnsPage";
 import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
+import GettingStartedPage from "./pages/GettingStartedPage";
+import GuidesTutorialsPage from "./pages/GuidesTutorialsPage";
 
 const queryClient = new QueryClient();
 
@@ -92,6 +94,8 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/help/getting-started" element={<GettingStartedPage />} />
+            <Route path="/help/guides" element={<GuidesTutorialsPage />} />
             <Route path="/shipping" element={<ShippingInfoPage />} />
             <Route path="/returns" element={<ReturnsPage />} />
             <Route path="/privacy" element={<PrivacyPolicyPage />} />
