@@ -46,6 +46,10 @@ import PainterSettingsPage from "./pages/painters/PainterSettingsPage";
 import PainterJobsPage from "./pages/painters/PainterJobsPage";
 import PainterSchedulePage from "./pages/painters/PainterSchedulePage";
 import PainterReviewsPage from "./pages/painters/PainterReviewsPage";
+import HelpCenterPage from "./pages/HelpCenterPage";
+import ShippingInfoPage from "./pages/ShippingInfoPage";
+import ReturnsPage from "./pages/ReturnsPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
 const queryClient = new QueryClient();
 
@@ -87,6 +91,10 @@ const App = () => (
             <Route path="/services" element={<ServicesPage />} />
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
+            <Route path="/help" element={<HelpCenterPage />} />
+            <Route path="/shipping" element={<ShippingInfoPage />} />
+            <Route path="/returns" element={<ReturnsPage />} />
+            <Route path="/privacy" element={<PrivacyPolicyPage />} />
 
             {/* Smart dashboard redirect — works for all roles */}
             <Route path="/dashboard" element={<DashboardRedirect />} />
