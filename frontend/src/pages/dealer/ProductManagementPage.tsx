@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
+import { HouseVisualizer } from "@/components/ui/HouseVisualizer";
 import { PageHeader, EmptyState } from "@/components/dashboard/DashboardComponents";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,8 @@ import {
   DollarSign,
   Info,
   Building,
+  Home,
+  Eye,
 } from "lucide-react";
 
 interface ProductForm {
@@ -58,6 +61,7 @@ export default function ProductManagementPage() {
   const { user, profile } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
+  const [showVisualizer, setShowVisualizer] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<ProductForm>({
     ...emptyForm,
@@ -332,13 +336,39 @@ export default function ProductManagementPage() {
                   <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="pl-10" placeholder="Optional product details..." />
                 </div>
               </div>
-              <div className="flex items-end">
-                <Button type="submit" variant="accent" className="gap-2 w-full" disabled={saveMutation.isPending}>
+              <div className="flex items-end gap-2">
+                <Button type="submit" variant="accent" className="gap-2 flex-1" disabled={saveMutation.isPending}>
                   {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   {editingId ? "Update" : "Add"} Product
                 </Button>
+                <Button
+                  type="button"
+                  variant={showVisualizer ? "default" : "outline"}
+                  className="gap-1"
+                  onClick={() => setShowVisualizer((v) => !v)}
+                  title="Preview on House"
+                >
+                  <Home className="w-4 h-4" />
+                  <Eye className="w-3.5 h-3.5" />
+                </Button>
               </div>
             </form>
+
+            {/* House Visualizer Preview */}
+            {showVisualizer && (
+              <div className="mt-6 pt-6 border-t border-border">
+                <div className="flex items-center gap-2 mb-3">
+                  <Home className="w-4 h-4 text-accent" />
+                  <span className="text-sm font-semibold text-foreground">House Exterior Preview</span>
+                  <span className="text-xs text-muted-foreground ml-1">— click zones on the house or pick from palettes</span>
+                </div>
+                <HouseVisualizer
+                  activeColorHex={form.colorHex}
+                  onColorSelect={(hex) => setForm((prev) => ({ ...prev, colorHex: hex }))}
+                  compact
+                />
+              </div>
+            )}
           </CardContent>
         </Card>
       )}

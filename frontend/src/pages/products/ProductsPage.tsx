@@ -13,6 +13,8 @@ import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCart } from "@/contexts/CartContext";
+import { useSearchParams } from "react-router-dom";
+import { PaintedWallPreview } from "@/components/ui/PaintedWallPreview";
 
 export default function ProductsPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -186,11 +188,11 @@ export default function ProductsPage() {
                   <Card variant="interactive" className="overflow-hidden group h-full flex flex-col">
                     <div className="relative">
                       {/* Product Color Display */}
-                      <div
-                        className="aspect-[4/3] w-full"
-                        style={{
-                          background: product.imageUrl || `linear-gradient(135deg, ${product.colorHex}dd 0%, ${product.colorHex} 100%)`
-                        }}
+                      <PaintedWallPreview 
+                        colorHex={product.colorHex} 
+                        imageUrl={product.imageUrl} 
+                        category={product.category}
+                        className="aspect-[4/3] w-full" 
                       />
 
                       {/* Overlay Actions */}
@@ -322,11 +324,11 @@ export default function ProductsPage() {
         <DialogContent className="max-w-4xl p-0 overflow-hidden bg-background border-border">
           {selectedProduct && (
             <div className="grid md:grid-cols-2">
-              <div 
-                className="aspect-square md:aspect-auto min-h-[300px]"
-                style={{
-                  background: selectedProduct.imageUrl || `linear-gradient(135deg, ${selectedProduct.colorHex}dd 0%, ${selectedProduct.colorHex} 100%)`
-                }}
+              <PaintedWallPreview 
+                colorHex={selectedProduct.colorHex} 
+                imageUrl={selectedProduct.imageUrl} 
+                category={selectedProduct.category}
+                className="aspect-square md:aspect-auto min-h-[300px]" 
               />
               <div className="p-8 flex flex-col">
                 <div className="mb-6">
