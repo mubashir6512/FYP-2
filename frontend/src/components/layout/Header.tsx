@@ -33,41 +33,22 @@ export function Header() {
       ];
     }
 
-    if (user.role === "customer") {
-      return [
-        ...baseLinks,
-        { name: "Find a Painter", href: "/painters" },
-        { name: "Dashboard", href: "/dashboard/home" },
-        { name: "My Orders", href: "/dashboard/orders" },
-      ];
-    }
+    const dashboardHref =
+      user.role === "dealer" ? "/dealer/dashboard" :
+      user.role === "painter" ? "/painter/dashboard" :
+      user.role === "admin" ? "/admin/dashboard" :
+      "/dashboard/home";
 
-    if (user.role === "dealer") {
-      return [
-        ...baseLinks,
-        { name: "POS", href: "/dealer/pos" },
-        { name: "Inventory", href: "/dealer/inventory" },
-        { name: "Dashboard", href: "/dealer/dashboard" },
-      ];
-    }
+    const ordersHref =
+      user.role === "dealer" ? "/dealer/orders" :
+      "/dashboard/orders";
 
-    if (user.role === "painter") {
-      return [
-        ...baseLinks,
-        { name: "Jobs", href: "/painter/jobs" },
-        { name: "Dashboard", href: "/painter/dashboard" },
-      ];
-    }
-
-    if (user.role === "admin") {
-      return [
-        ...baseLinks,
-        { name: "Dashboard", href: "/admin/dashboard" },
-        { name: "Users", href: "/admin/users" },
-      ];
-    }
-
-    return baseLinks;
+    return [
+      ...baseLinks,
+      { name: "Find a Painter", href: "/painters" },
+      { name: "Dashboard", href: dashboardHref },
+      { name: "My Orders", href: ordersHref },
+    ];
   };
 
   const navLinks = getNavLinks();

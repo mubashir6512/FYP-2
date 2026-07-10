@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useState, useRef, useCallback, lazy, Suspense } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -9,8 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
-import { api } from "@/lib/api";
-import { useQuery } from "@tanstack/react-query";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ModeTabs, type VisualizerMode } from "@/components/visualizer/ModeTabs";
+import { MultiSideUploader, type SideImage, type SideKey } from "@/components/visualizer/MultiSideUploader";
+import { SideGallery, type SideResult } from "@/components/visualizer/SideGallery";
 import {
   Upload,
   Paintbrush,
@@ -25,7 +27,15 @@ import {
   Sparkles,
   Eye,
   Palette,
+  Box,
+  Images,
+  Film,
 } from "lucide-react";
+
+const Room3DViewer = lazy(() => import("@/components/visualizer/Room3DViewer"));
+const VideoGenerator = lazy(() => import("@/components/visualizer/VideoGenerator"));
+
+type ResultView = "gallery" | "3d" | "video";
 
 interface RoomAnalysis {
   walls_detected: number;
@@ -62,34 +72,12 @@ type Step = "upload" | "analyzing" | "results" | "visualizing" | "comparison";
 const isValidHex = (hex: string) => /^#([0-9A-Fa-f]{6})$/.test(hex);
 
 export default function VisualizerPage() {
+  const [mode, setMode] = useState<VisualizerMode>("single");
   const [step, setStep] = useState<Step>("upload");
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string | null>(null);
   const [analysis, setAnalysis] = useState<RoomAnalysis | null>(null);
-
-  // Fetch real paint products from backend
-  const { data: dbProducts = [] } = useQuery({
-    queryKey: ["visualizer-paints"],
-    queryFn: () => api("/products?category=paint"),
-  });
-
-  const availableColors = dbProducts.length > 0 
-    ? dbProducts.map((p: any) => ({
-        name: p.name,
-        hex: p.colorHex || "#888888",
-        category: p.brand || "Paint",
-        id: p.id
-      }))
-    : PAINT_COLORS;
-
-  const [selectedColor, setSelectedColor] = useState(availableColors[0]);
-  
-  // Update selected color if availableColors changes and currently none selected
-  useEffect(() => {
-    if (availableColors.length > 0 && (!selectedColor || !availableColors.find(c => c.hex === selectedColor.hex))) {
-      setSelectedColor(availableColors[0]);
-    }
-  }, [availableColors]);
+  const [selectedColor, setSelectedColor] = useState(PAINT_COLORS[0]);
   const [customHex, setCustomHex] = useState("#");
   const [customName, setCustomName] = useState("Custom Color");
   const [visualizedImage, setVisualizedImage] = useState<string | null>(null);
@@ -98,6 +86,45 @@ export default function VisualizerPage() {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const comparisonRef = useRef<HTMLDivElement>(null);
+
+  // Multi-side state
+  const [multiSides, setMultiSides] = useState<Partial<Record<SideKey, SideImage>>>({});
+  const [batchResults, setBatchResults] = useState<SideResult[] | null>(null);
+  const [batchLoading, setBatchLoading] = useState(false);
+  const [resultView, setResultView] = useState<ResultView>("gallery");
+
+  const sidesArray = Object.values(multiSides).filter(Boolean) as SideImage[];
+  const canBatch = !!multiSides.front && sidesArray.length >= 2;
+
+  const runBatch = async () => {
+    if (!canBatch) return;
+    setBatchLoading(true);
+    setBatchResults(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("visualize-room", {
+        body: {
+          action: "visualize_batch",
+          mode: mode === "exterior" ? "exterior" : "interior",
+          colorName: selectedColor.name,
+          colorHex: selectedColor.hex,
+          sides: sidesArray.map((s) => ({ side: s.side, imageUrl: s.publicUrl })),
+        },
+      });
+      if (error) throw error;
+      if (data?.error) throw new Error(data.error);
+      setBatchResults(data.results || []);
+      setResultView("gallery");
+    } catch (err: any) {
+      toast.error(err.message || "Batch visualization failed");
+    } finally {
+      setBatchLoading(false);
+    }
+  };
+
+  const resetMulti = () => {
+    setMultiSides({});
+    setBatchResults(null);
+  };
 
   const handleFileUpload = useCallback(async (file: File) => {
     if (!file.type.startsWith("image/")) {
@@ -245,6 +272,34 @@ export default function VisualizerPage() {
             </p>
           </div>
 
+          {/* Mode Tabs */}
+          <ModeTabs mode={mode} onChange={setMode} />
+
+          {/* Multi-side flow */}
+          {mode !== "single" && (
+            <MultiSideFlow
+              mode={mode}
+              sides={multiSides}
+              onChangeSides={setMultiSides}
+              canBatch={canBatch}
+              onRunBatch={runBatch}
+              onReset={resetMulti}
+              loading={batchLoading}
+              results={batchResults}
+              resultView={resultView}
+              setResultView={setResultView}
+              selectedColor={selectedColor}
+              setSelectedColor={setSelectedColor}
+              customHex={customHex}
+              setCustomHex={setCustomHex}
+              customName={customName}
+              setCustomName={setCustomName}
+            />
+          )}
+
+          {/* Single-photo flow */}
+          {mode === "single" && (
+          <>
           {/* Step Indicator */}
           <div className="flex items-center justify-center gap-2 mb-10">
             {[
@@ -470,10 +525,10 @@ export default function VisualizerPage() {
                     <h2 className="font-display text-2xl font-bold text-foreground mb-4">
                       Choose Your Paint Color
                     </h2>
-                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-3 mb-6">
-                      {availableColors.map((color: any) => (
+                    <div className="grid grid-cols-4 gap-3 mb-6">
+                      {PAINT_COLORS.map((color) => (
                         <button
-                          key={color.hex + (color.id || color.name)}
+                          key={color.hex}
                           onClick={() => setSelectedColor(color)}
                           className={`paint-swatch group relative ${
                             selectedColor.hex === color.hex ? "selected" : ""
@@ -750,9 +805,209 @@ export default function VisualizerPage() {
               </motion.div>
             )}
           </AnimatePresence>
+          </>
+          )}
         </div>
       </main>
       <Footer />
+    </div>
+  );
+}
+
+// ============= Multi-side flow component =============
+
+interface MultiSideFlowProps {
+  mode: Exclude<VisualizerMode, "single">;
+  sides: Partial<Record<SideKey, SideImage>>;
+  onChangeSides: (s: Partial<Record<SideKey, SideImage>>) => void;
+  canBatch: boolean;
+  onRunBatch: () => void;
+  onReset: () => void;
+  loading: boolean;
+  results: SideResult[] | null;
+  resultView: ResultView;
+  setResultView: (v: ResultView) => void;
+  selectedColor: typeof PAINT_COLORS[number];
+  setSelectedColor: (c: typeof PAINT_COLORS[number]) => void;
+  customHex: string;
+  setCustomHex: (s: string) => void;
+  customName: string;
+  setCustomName: (s: string) => void;
+}
+
+function MultiSideFlow(p: MultiSideFlowProps) {
+  return (
+    <div className="max-w-6xl mx-auto space-y-8">
+      {!p.results && (
+        <>
+          <Card className="p-6">
+            <div className="mb-4">
+              <h2 className="font-display text-2xl font-bold text-foreground mb-1">
+                Upload {p.mode === "exterior" ? "building facades" : "room walls"}
+              </h2>
+              <p className="text-muted-foreground text-sm">
+                Add 2–4 sides. The Front side is required. Missing sides will use the selected color in the 3D view.
+              </p>
+            </div>
+            <MultiSideUploader mode={p.mode} sides={p.sides} onChange={p.onChangeSides} />
+          </Card>
+
+          <Card className="p-6">
+            <h3 className="font-display text-xl font-bold text-foreground mb-4">Choose paint color</h3>
+            <div className="grid grid-cols-6 sm:grid-cols-8 gap-3 mb-5">
+              {PAINT_COLORS.map((color) => (
+                <button
+                  key={color.hex}
+                  onClick={() => p.setSelectedColor(color)}
+                  className={`paint-swatch group relative ${
+                    p.selectedColor.hex === color.hex ? "selected" : ""
+                  }`}
+                  style={{ backgroundColor: color.hex }}
+                  title={color.name}
+                  aria-label={color.name}
+                />
+              ))}
+            </div>
+            <div className="flex flex-wrap items-center gap-3 mb-5">
+              <Palette className="w-4 h-4 text-muted-foreground" />
+              <span className="text-sm font-medium text-foreground">Or custom:</span>
+              <input
+                type="color"
+                value={isValidHex(p.customHex) ? p.customHex : "#888888"}
+                onChange={(e) => {
+                  const hex = e.target.value;
+                  p.setCustomHex(hex);
+                  p.setSelectedColor({ name: p.customName, hex, category: "Custom" });
+                }}
+                className="w-10 h-10 rounded-lg border border-border cursor-pointer bg-transparent p-0.5"
+              />
+              <Input
+                value={p.customHex}
+                onChange={(e) => {
+                  let val = e.target.value;
+                  if (!val.startsWith("#")) val = "#" + val;
+                  p.setCustomHex(val);
+                  if (isValidHex(val)) p.setSelectedColor({ name: p.customName, hex: val, category: "Custom" });
+                }}
+                placeholder="#FF5733"
+                className="w-28 font-mono text-sm"
+                maxLength={7}
+              />
+              <Input
+                value={p.customName}
+                onChange={(e) => {
+                  p.setCustomName(e.target.value);
+                  if (isValidHex(p.customHex)) {
+                    p.setSelectedColor({ name: e.target.value || "Custom Color", hex: p.customHex, category: "Custom" });
+                  }
+                }}
+                placeholder="Color name"
+                className="flex-1 min-w-[140px] text-sm"
+              />
+            </div>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-lg shadow" style={{ backgroundColor: p.selectedColor.hex }} />
+                <div>
+                  <p className="font-semibold text-foreground">{p.selectedColor.name}</p>
+                  <p className="text-xs text-muted-foreground">{p.selectedColor.hex}</p>
+                </div>
+              </div>
+              <Button
+                variant="accent"
+                size="lg"
+                disabled={!p.canBatch || p.loading}
+                onClick={p.onRunBatch}
+              >
+                {p.loading ? (
+                  <><Loader2 className="w-4 h-4 mr-2 animate-spin" />Repainting…</>
+                ) : (
+                  <><Paintbrush className="w-4 h-4 mr-2" />Repaint all sides</>
+                )}
+              </Button>
+            </div>
+            {!p.canBatch && (
+              <p className="text-xs text-muted-foreground mt-3">
+                Add the Front side and at least one more to enable repainting.
+              </p>
+            )}
+          </Card>
+        </>
+      )}
+
+      {p.loading && (
+        <Card className="p-10 text-center">
+          <Loader2 className="w-10 h-10 text-accent animate-spin mx-auto mb-4" />
+          <p className="font-semibold text-foreground">AI is repainting each side…</p>
+          <p className="text-sm text-muted-foreground mt-1">This usually takes 15–30 seconds per side.</p>
+        </Card>
+      )}
+
+      {p.results && (
+        <Card className="p-6">
+          <div className="flex items-center justify-between flex-wrap gap-4 mb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg shadow" style={{ backgroundColor: p.selectedColor.hex }} />
+              <div>
+                <p className="font-semibold text-foreground">{p.selectedColor.name}</p>
+                <p className="text-xs text-muted-foreground">{p.selectedColor.hex}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Tabs value={p.resultView} onValueChange={(v) => p.setResultView(v as ResultView)}>
+                <TabsList>
+                  <TabsTrigger value="gallery" className="gap-2">
+                    <Images className="w-4 h-4" />Gallery
+                  </TabsTrigger>
+                  <TabsTrigger value="3d" className="gap-2">
+                    <Box className="w-4 h-4" />3D {p.mode === "exterior" ? "Building" : "Room"}
+                  </TabsTrigger>
+                  <TabsTrigger value="video" className="gap-2">
+                    <Film className="w-4 h-4" />Video
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+              <Button variant="outline" size="sm" onClick={p.onRunBatch} disabled={p.loading}>
+                <RefreshCw className="w-4 h-4 mr-2" />Recolor
+              </Button>
+              <Button variant="ghost" size="sm" onClick={p.onReset}>
+                <ArrowLeft className="w-4 h-4 mr-2" />New
+              </Button>
+            </div>
+          </div>
+
+          {p.resultView === "gallery" && (
+            <SideGallery results={p.results} colorName={p.selectedColor.name} />
+          )}
+          {p.resultView === "3d" && (
+            <Suspense fallback={
+              <div className="aspect-video rounded-xl bg-muted flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-accent animate-spin" />
+              </div>
+            }>
+              <Room3DViewer
+                results={p.results}
+                fallbackHex={p.selectedColor.hex}
+                mode={p.mode === "exterior" ? "exterior" : "interior"}
+              />
+            </Suspense>
+          )}
+          {p.resultView === "video" && (
+            <Suspense fallback={
+              <div className="aspect-video rounded-xl bg-muted flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-accent animate-spin" />
+              </div>
+            }>
+              <VideoGenerator
+                results={p.results}
+                colorName={p.selectedColor.name}
+                colorHex={p.selectedColor.hex}
+                mode={p.mode === "exterior" ? "exterior" : "interior"}
+              />
+            </Suspense>
+          )}
+        </Card>
+      )}
     </div>
   );
 }

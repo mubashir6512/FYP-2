@@ -1,0 +1,40 @@
+You are an expert full-stack developer AI assistant. I have imported a complete multi-vendor paint e-commerce platform called "AI Paint Palace" into this workspace under the folder `ai-paint-palace-import`.
+
+Inside `ai-paint-palace-import`, there is a file called `ALL_PROJECT_CODE.txt` which contains all the source code files and SQL migrations combined into a single text file. Each file starts with a header block like this:
+========================================
+ FILE: path/to/file.tsx
+========================================
+...file content...
+
+And SQL migrations start with:
+========================================
+ SQL MIGRATION: migration_name.sql
+========================================
+...SQL migration content...
+
+Your goal is to fully extract this project and integrate it. Please perform the following steps:
+
+1. READ the entire content of `./ai-paint-palace-import/ALL_PROJECT_CODE.txt`.
+2. EXTRACT each file listed in the file to its correct location. You should place them in the frontend project (if it has a dedicated frontend/ folder like `./frontend`) or in the root workspace depending on the project structure:
+   - Identify where the main React/Vite application is located (e.g. `./frontend/` or root).
+   - Recreate the file structure: pages, components, lib, hooks, integrations, contexts, layouts, config files, etc.
+3. DEPENDENCIES: Install the required npm packages in the target frontend directory. Look at the package.json entries in the source dump and make sure the following are installed:
+   - `@react-three/fiber`, `@react-three/drei`, `three` (and types) for 3D Room Viewer
+   - `framer-motion` for animations
+   - `@supabase/supabase-js` for backend database/auth interaction
+   - `@tanstack/react-query`, `lucide-react`, `sonner`, `react-markdown`, `recharts`
+   - All required `@radix-ui` primitives used by shadcn components.
+4. CSS & TAILWIND CONFIGURATION:
+   - Open the target global CSS file (usually `index.css` or `globals.css`) and append all CSS variables, custom swatch styles, glassmorphism classes, and animations from the dumped `src/index.css`.
+   - Merge the configurations from `tailwind.config.ts` (especially custom colors like brand, paint colors, animations, and keyframes) into the target project's `tailwind.config.js` or `tailwind.config.ts`.
+5. DATABASE:
+   - Provide the SQL migration scripts or run them if a database setup tool/console is available. The DB contains tables: `profiles`, `user_roles`, `account_approvals`, `products`, `pos_orders`, `pos_order_items`, `painter_jobs`, `painter_profiles`, `painter_reviews`, `job_messages`, `knowledge_chunks`.
+6. ROUTING:
+   - Hook up the visualizer, dashboard layouts, POS page, painter pages, and other modules to the main React Router navigation (e.g., in `App.tsx`).
+7. ENVIRONMENT VARIABLES:
+   - Set up the `.env` file with these values:
+     VITE_SUPABASE_PROJECT_ID="mowgblkqqbiwgixrvdhw"
+     VITE_SUPABASE_URL="https://mowgblkqqbiwgixrvdhw.supabase.co"
+     VITE_SUPABASE_PUBLISHABLE_KEY="<provided in the client file or your own>"
+
+Let's begin! Please read the `ALL_PROJECT_CODE.txt` file first, unpack the files, and let me know when you are ready to configure Tailwind and install dependencies.

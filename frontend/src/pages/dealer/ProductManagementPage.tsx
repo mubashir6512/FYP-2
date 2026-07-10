@@ -68,16 +68,22 @@ export default function ProductManagementPage() {
     brand: profile?.businessName || ""
   });
 
-  // Sync brand with profile business name once it loads
+  // Sync brand and auto-generate SKU once profile loads
   useEffect(() => {
-    // Only auto-populate if we are adding a NEW product and brand is currently empty
-    if (!editingId && !form.brand) {
-      const brandName = profile?.businessName || (user as any)?.fullName;
-      if (brandName) {
-        setForm(prev => ({ ...prev, brand: brandName }));
-      }
+    // Only auto-populate if we are adding a NEW product and brand/sku is currently empty
+    if (!editingId) {
+      const brandName = profile?.businessName || "";
+      const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+      const prefix = brandName ? brandName.substring(0, 3).toUpperCase() : "PV";
+      const cat = form.category.substring(0, 3).toUpperCase();
+      
+      setForm(prev => ({
+        ...prev,
+        brand: prev.brand || brandName,
+        sku: prev.sku || `${prefix}-${cat}-${random}`
+      }));
     }
-  }, [profile, user, editingId]);
+  }, [profile, editingId]);
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["dealer-products", user?.id],
@@ -137,9 +143,14 @@ export default function ProductManagementPage() {
   const resetForm = () => {
     setShowForm(false);
     setEditingId(null);
+    const brandName = profile?.businessName || "";
+    const random = Math.random().toString(36).substring(2, 6).toUpperCase();
+    const prefix = brandName ? brandName.substring(0, 3).toUpperCase() : "PV";
+    const cat = emptyForm.category.substring(0, 3).toUpperCase();
     setForm({
       ...emptyForm,
-      brand: profile?.businessName || ""
+      brand: brandName,
+      sku: `${prefix}-${cat}-${random}`
     });
   };
 
@@ -252,7 +263,22 @@ export default function ProductManagementPage() {
                   <Layers className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground z-10" />
                   <select
                     value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                    onChange={(e) => {
+                      const newCat = e.target.value;
+                      setForm(prev => {
+                        const nextForm = { ...prev, category: newCat };
+                        if (prev.sku) {
+                          const parts = prev.sku.split("-");
+                          if (parts.length === 3) {
+                            const prefix = parts[0];
+                            const cat = newCat.substring(0, 3).toUpperCase();
+                            const random = parts[2];
+                            nextForm.sku = `${prefix}-${cat}-${random}`;
+                          }
+                        }
+                        return nextForm;
+                      });
+                    }}
                     className="w-full h-10 rounded-md border border-input bg-background pl-10 pr-3 text-sm focus:ring-2 focus:ring-accent outline-none"
                   >
                     <option value="paint">Paint</option>
@@ -266,20 +292,54 @@ export default function ProductManagementPage() {
               <div>
                 <label className="text-sm font-medium text-foreground mb-1 block flex items-center justify-between">
                   Brand
-                  <button 
-                    type="button"
-                    onClick={() => {
-                      const brandName = profile?.businessName || (user as any)?.fullName;
-                      if (brandName) setForm({ ...form, brand: brandName });
-                    }}
-                    className="text-[10px] text-accent hover:underline uppercase font-bold"
-                  >
-                    Use My Name
-                  </button>
+                  {profile?.businessName && (
+                    <button 
+                      type="button"
+                      onClick={() => {
+                        if (profile?.businessName) {
+                          setForm(prev => {
+                            const nextForm = { ...prev, brand: profile.businessName };
+                            if (prev.sku) {
+                              const parts = prev.sku.split("-");
+                              if (parts.length === 3) {
+                                const prefix = profile.businessName.substring(0, 3).toUpperCase();
+                                const cat = parts[1];
+                                const random = parts[2];
+                                nextForm.sku = `${prefix}-${cat}-${random}`;
+                              }
+                            }
+                            return nextForm;
+                          });
+                        }
+                      }}
+                      className="text-[10px] text-accent hover:underline uppercase font-bold"
+                    >
+                      Use Business Name
+                    </button>
+                  )}
                 </label>
                 <div className="relative">
                   <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input value={form.brand} onChange={(e) => setForm({ ...form, brand: e.target.value })} className="pl-10" />
+                  <Input 
+                    value={form.brand} 
+                    onChange={(e) => {
+                      const newBrand = e.target.value;
+                      setForm(prev => {
+                        const nextForm = { ...prev, brand: newBrand };
+                        if (prev.sku) {
+                          const parts = prev.sku.split("-");
+                          if (parts.length === 3) {
+                            const prefix = newBrand ? newBrand.substring(0, 3).toUpperCase() : "PV";
+                            const cat = parts[1];
+                            const random = parts[2];
+                            nextForm.sku = `${prefix}-${cat}-${random}`;
+                          }
+                        }
+                        return nextForm;
+                      });
+                    }} 
+                    className="pl-10" 
+                  />
                 </div>
               </div>
               <div>

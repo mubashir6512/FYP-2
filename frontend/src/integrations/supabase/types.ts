@@ -10,10 +10,120 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
+      account_approvals: {
+        Row: {
+          created_at: string
+          id: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["approval_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["approval_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["approval_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      job_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          job_id: string
+          read_at: string | null
+          sender_id: string
+          sender_role: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          job_id: string
+          read_at?: string | null
+          sender_id: string
+          sender_role: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          job_id?: string
+          read_at?: string | null
+          sender_id?: string
+          sender_role?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_messages_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "painter_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      knowledge_chunks: {
+        Row: {
+          content: string
+          created_at: string
+          embedding: string | null
+          id: string
+          metadata: Json
+          source_id: string
+          source_type: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json
+          source_id: string
+          source_type: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          embedding?: string | null
+          id?: string
+          metadata?: Json
+          source_id?: string
+          source_type?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       painter_jobs: {
         Row: {
           created_at: string
@@ -64,6 +174,48 @@ export type Database = {
           scheduled_date?: string | null
           scheduled_time?: string | null
           status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      painter_profiles: {
+        Row: {
+          availability: string
+          bio: string | null
+          created_at: string
+          experience_years: number
+          hourly_rate: number
+          id: string
+          location: string
+          painter_id: string
+          skills: string[]
+          specialty: string
+          updated_at: string
+        }
+        Insert: {
+          availability?: string
+          bio?: string | null
+          created_at?: string
+          experience_years?: number
+          hourly_rate?: number
+          id?: string
+          location?: string
+          painter_id: string
+          skills?: string[]
+          specialty?: string
+          updated_at?: string
+        }
+        Update: {
+          availability?: string
+          bio?: string | null
+          created_at?: string
+          experience_years?: number
+          hourly_rate?: number
+          id?: string
+          location?: string
+          painter_id?: string
+          skills?: string[]
+          specialty?: string
           updated_at?: string
         }
         Relationships: []
@@ -328,9 +480,31 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_account_approved: { Args: { _user_id: string }; Returns: boolean }
+      is_job_participant: {
+        Args: { _job_id: string; _user_id: string }
+        Returns: boolean
+      }
+      match_knowledge: {
+        Args: {
+          filter_source_type?: string
+          match_count?: number
+          query_embedding: string
+        }
+        Returns: {
+          content: string
+          id: string
+          metadata: Json
+          similarity: number
+          source_id: string
+          source_type: string
+          title: string
+        }[]
+      }
     }
     Enums: {
       app_role: "customer" | "dealer" | "painter" | "admin"
+      approval_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -459,6 +633,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["customer", "dealer", "painter", "admin"],
+      approval_status: ["pending", "approved", "rejected"],
     },
   },
 } as const

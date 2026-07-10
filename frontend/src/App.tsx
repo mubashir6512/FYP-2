@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2 } from "lucide-react";
+import ChatWidget from "@/components/chat/ChatWidget";
 
 // Pages
 import Index from "./pages/Index";
@@ -41,6 +42,7 @@ import AdminPaintersPage from "./pages/admin/AdminPaintersPage";
 import AdminReportsPage from "./pages/admin/AdminReportsPage";
 import AdminSecurityPage from "./pages/admin/AdminSecurityPage";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
+import ApprovalsPage from "./pages/admin/ApprovalsPage";
 import CheckoutPage from "./pages/customer/CheckoutPage";
 import PainterSettingsPage from "./pages/painters/PainterSettingsPage";
 import PainterJobsPage from "./pages/painters/PainterJobsPage";
@@ -82,6 +84,7 @@ const App = () => (
           <Sonner />
         <BrowserRouter>
           <ScrollToTop />
+          <ChatWidget />
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index />} />
@@ -134,6 +137,7 @@ const App = () => (
 
             {/* Admin Dashboard */}
             <Route path="/admin/dashboard" element={<ProtectedRoute allowedRoles={["admin"]}><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/approvals" element={<ProtectedRoute allowedRoles={["admin"]}><ApprovalsPage /></ProtectedRoute>} />
             <Route path="/admin/analytics" element={<ProtectedRoute allowedRoles={["admin"]}><SalesAnalyticsPage /></ProtectedRoute>} />
             <Route path="/admin/users"     element={<ProtectedRoute allowedRoles={["admin"]}><AdminUsersPage /></ProtectedRoute>} />
             <Route path="/admin/dealers"   element={<ProtectedRoute allowedRoles={["admin"]}><AdminDealersPage /></ProtectedRoute>} />

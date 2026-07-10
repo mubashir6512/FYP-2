@@ -42,6 +42,7 @@ async function main() {
             profile: {
                 create: {
                     fullName: 'Modern Paints & Decor',
+                    businessName: 'Modern Paints & Decor',
                     phone: '+92 300 1234567'
                 }
             }

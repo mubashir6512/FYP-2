@@ -57,3 +57,14 @@ This project can be deployed using various hosting platforms such as Vercel, Net
 Yes, you can!
 
 Most hosting platforms allow you to connect custom domains through their dashboard settings. Check your hosting provider's documentation for specific instructions on domain configuration.
+
+
+Role	Email
+Admin	admin@paintverse.com
+Dealer	dealer@paintverse.com
+Customer	customer@test.com
+Painter 1	painter@pro.com
+Painter 2	painter2@pro.com
+Painter 3	painter3@pro.com
+Painter 4	painter4@pro.com
+Painter 5	painter5@pro.com
