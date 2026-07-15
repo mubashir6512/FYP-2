@@ -49,7 +49,7 @@ const emptyForm: ProductForm = {
   category: "paint",
   brand: "",
   colorHex: "#4A90D9",
-  unit: "litre",
+  unit: "gallon",
   price: "",
   costPrice: "",
   stockQuantity: "",
@@ -361,8 +361,8 @@ export default function ProductManagementPage() {
                   onChange={(e) => setForm({ ...form, unit: e.target.value })}
                   className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                 >
-                  <option value="litre">Litre</option>
                   <option value="gallon">Gallon</option>
+                  <option value="litre">Litre</option>
                   <option value="piece">Piece</option>
                   <option value="kg">Kg</option>
                 </select>

@@ -348,6 +348,7 @@ async function main() {
         await prisma.product.create({
             data: {
                 ...p,
+                unit: 'gallon',
                 dealerId: dealer.id,
             }
         });
