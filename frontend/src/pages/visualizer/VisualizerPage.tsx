@@ -962,9 +962,10 @@ function MultiSideFlow(p: MultiSideFlowProps) {
                   <TabsTrigger value="3d" className="gap-2">
                     <Box className="w-4 h-4" />3D {p.mode === "exterior" ? "Building" : "Room"}
                   </TabsTrigger>
-                  <TabsTrigger value="video" className="gap-2">
+                  {/* Video tab temporarily disabled */}
+                  {/* <TabsTrigger value="video" className="gap-2">
                     <Film className="w-4 h-4" />Video
-                  </TabsTrigger>
+                  </TabsTrigger> */}
                 </TabsList>
               </Tabs>
               <Button variant="outline" size="sm" onClick={p.onRunBatch} disabled={p.loading}>
@@ -992,7 +993,8 @@ function MultiSideFlow(p: MultiSideFlowProps) {
               />
             </Suspense>
           )}
-          {p.resultView === "video" && (
+          {/* Video view temporarily disabled */}
+          {/* {p.resultView === "video" && (
             <Suspense fallback={
               <div className="aspect-video rounded-xl bg-muted flex items-center justify-center">
                 <Loader2 className="w-8 h-8 text-accent animate-spin" />
@@ -1005,7 +1007,7 @@ function MultiSideFlow(p: MultiSideFlowProps) {
                 mode={p.mode === "exterior" ? "exterior" : "interior"}
               />
             </Suspense>
-          )}
+          )} */}
         </Card>
       )}
     </div>
