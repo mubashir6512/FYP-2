@@ -64,7 +64,7 @@ export function BookPainterDialog({ painter, onClose }: Props) {
     const { error } = await supabase.from("painter_jobs").insert({
       painter_id: painter.painter_id,
       customer_id: user.id,
-      customer_name: profile?.full_name || "Customer",
+      customer_name: profile?.fullName || "Customer",
       customer_phone: form.customer_phone || null,
       job_type: form.job_type,
       location: form.location,
@@ -174,19 +174,19 @@ export function BookPainterDialog({ painter, onClose }: Props) {
           </div>
 
           <div>
-            <Label htmlFor="estimated_hours">Estimated Hours</Label>
+            <Label htmlFor="estimated_hours">Estimated Days</Label>
             <Input
               id="estimated_hours"
               type="number"
               min="1"
               value={form.estimated_hours}
               onChange={(e) => setForm({ ...form, estimated_hours: e.target.value })}
-              placeholder="e.g. 8"
+              placeholder="e.g. 2"
               className="mt-1"
             />
             {form.estimated_hours && painter.hourly_rate > 0 && (
               <p className="text-xs text-muted-foreground mt-1">
-                Estimated cost: â‚¹{(parseInt(form.estimated_hours) * painter.hourly_rate).toFixed(0)}
+                Estimated cost: Rs. {(parseInt(form.estimated_hours) * painter.hourly_rate).toFixed(0)} ({form.estimated_hours} day{parseInt(form.estimated_hours) > 1 ? 's' : ''} × Rs. {painter.hourly_rate}/day)
               </p>
             )}
           </div>

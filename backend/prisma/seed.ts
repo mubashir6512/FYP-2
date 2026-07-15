@@ -71,7 +71,8 @@ async function main() {
             profile: {
                 create: {
                     fullName: 'Muhammad Asif',
-                    phone: '+92 300 7654321'
+                    phone: '+92 300 7654321',
+                    hourlyRate: 3000,
                 }
             }
         }
@@ -85,7 +86,8 @@ async function main() {
             profile: {
                 create: {
                     fullName: 'Ali Hassan',
-                    phone: '+92 321 5556677'
+                    phone: '+92 321 5556677',
+                    hourlyRate: 3200,
                 }
             }
         }
@@ -99,7 +101,8 @@ async function main() {
             profile: {
                 create: {
                     fullName: 'Fatima Malik',
-                    phone: '+92 333 4445566'
+                    phone: '+92 333 4445566',
+                    hourlyRate: 2800,
                 }
             }
         }
@@ -113,7 +116,8 @@ async function main() {
             profile: {
                 create: {
                     fullName: 'Usman Ahmed',
-                    phone: '+92 345 8889900'
+                    phone: '+92 345 8889900',
+                    hourlyRate: 3500,
                 }
             }
         }
@@ -127,7 +131,8 @@ async function main() {
             profile: {
                 create: {
                     fullName: 'Ayesha Siddiqui',
-                    phone: '+92 301 2223344'
+                    phone: '+92 301 2223344',
+                    hourlyRate: 3000,
                 }
             }
         }

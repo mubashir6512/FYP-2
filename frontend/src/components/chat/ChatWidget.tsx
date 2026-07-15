@@ -9,7 +9,7 @@ import { toast } from "sonner";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const SUGGESTIONS = [
-  "Show me white interior paints under â‚¹500",
+  "Show me white interior paints under Rs. 500",
   "Find a top-rated painter near me",
   "Which dealer stocks Asian Paints?",
 ];

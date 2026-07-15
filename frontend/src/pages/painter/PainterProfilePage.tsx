@@ -226,7 +226,7 @@ export default function PainterProfilePage() {
                 )}
               </div>
               <div>
-                <Label htmlFor="hourly_rate">Hourly Rate (â‚¹)</Label>
+                <Label htmlFor="hourly_rate">Per Day Rate (Rs.)</Label>
                 <Input
                   id="hourly_rate"
                   type="number"

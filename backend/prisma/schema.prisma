@@ -48,7 +48,7 @@ model Profile {
   bio            String?  @db.Text
   experience     Int?     @default(0)
   specialization String?  @db.Text
-  hourlyRate     Decimal? @default(500) @map("hourly_rate") @db.Decimal
+  hourlyRate     Decimal? @default(3000) @map("hourly_rate") @db.Decimal
   businessName   String?  @map("business_name") @db.Text
   address        String?  @db.Text
   city           String?  @db.Text

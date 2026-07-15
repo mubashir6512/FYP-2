@@ -148,7 +148,7 @@ export default function PainterSettingsPage() {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">Hourly Rate (Rs.)</label>
+                    <label className="text-sm font-medium">Per Day Rate (Rs.)</label>
                     <div className="relative">
                       <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                       <Input 

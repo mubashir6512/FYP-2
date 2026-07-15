@@ -39,7 +39,7 @@ export function PaintersSection() {
     reviews: p.profile?.reviewsCount || 0,
     location: p.profile?.city || p.profile?.address || "Available Locally",
     experience: `${p.profile?.experience || 5} years`,
-    hourlyRate: Number(p.profile?.hourlyRate) > 0 ? Number(p.profile?.hourlyRate) : 500,
+    hourlyRate: Number(p.profile?.hourlyRate) > 0 ? Number(p.profile?.hourlyRate) : 3000,
     availability: p.profile?.availability || "Available",
     avatar: (p.profile?.fullName || p.email).substring(0, 2).toUpperCase(),
     skills: p.profile?.skills || ["Interior", "Exterior"],
@@ -143,7 +143,7 @@ export function PaintersSection() {
                         <span className="text-2xl font-bold text-foreground">
                           Rs. {painter.hourlyRate}
                         </span>
-                        <span className="text-sm text-muted-foreground">/hr</span>
+                        <span className="text-sm text-muted-foreground">/day</span>
                       </div>
                       <Button
                         variant="accent"
