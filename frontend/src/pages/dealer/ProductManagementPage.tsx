@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { HouseVisualizer } from "@/components/ui/HouseVisualizer";
+import { PaintedWallPreview } from "@/components/ui/PaintedWallPreview";
 import { PageHeader, EmptyState } from "@/components/dashboard/DashboardComponents";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -170,6 +171,7 @@ export default function ProductManagementPage() {
     });
     setEditingId(product.id);
     setShowForm(true);
+    setShowVisualizer(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -204,6 +206,7 @@ export default function ProductManagementPage() {
           onClick={() => {
             resetForm();
             setShowForm(true);
+            setShowVisualizer(true);
           }}
         >
           <Plus className="w-4 h-4" />
@@ -401,7 +404,7 @@ export default function ProductManagementPage() {
                   {saveMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   {editingId ? "Update" : "Add"} Product
                 </Button>
-                <Button
+                {/* <Button
                   type="button"
                   variant={showVisualizer ? "default" : "outline"}
                   className="gap-1"
@@ -410,12 +413,12 @@ export default function ProductManagementPage() {
                 >
                   <Home className="w-4 h-4" />
                   <Eye className="w-3.5 h-3.5" />
-                </Button>
+                </Button> */}
               </div>
             </form>
 
             {/* House Visualizer Preview */}
-            {showVisualizer && (
+            {/* {showVisualizer && (
               <div className="mt-6 pt-6 border-t border-border">
                 <div className="flex items-center gap-2 mb-3">
                   <Home className="w-4 h-4 text-accent" />
@@ -428,7 +431,7 @@ export default function ProductManagementPage() {
                   compact
                 />
               </div>
-            )}
+            )} */}
           </CardContent>
         </Card>
       )}
@@ -454,7 +457,11 @@ export default function ProductManagementPage() {
           {products.map((product: any) => (
             <Card key={product.id} className="overflow-hidden">
               {product.colorHex && (
-                <div className="h-16" style={{ backgroundColor: product.colorHex }} />
+                <PaintedWallPreview
+                  colorHex={product.colorHex}
+                  category={product.category === "exterior" ? "exterior" : "interior"}
+                  className="h-28 w-full"
+                />
               )}
               <CardContent className="p-4">
                 <div className="flex items-start justify-between mb-2">

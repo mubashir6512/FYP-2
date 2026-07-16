@@ -84,7 +84,7 @@ const App = () => (
           <Sonner />
         <BrowserRouter>
           <ScrollToTop />
-          <ChatWidget />
+          {/* <ChatWidget /> */}
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Index />} />

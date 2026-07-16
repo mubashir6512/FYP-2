@@ -163,237 +163,243 @@ export function HouseVisualizer({
       <div className="hv-svg-card">
         <div className="hv-checkerboard" style={{ padding: compact ? 12 : 20 }}>
           <svg
-            viewBox="0 0 800 500"
+            viewBox="0 0 1000 600"
             xmlns="http://www.w3.org/2000/svg"
             style={{ width: "100%", height: "auto", display: "block" }}
           >
-            {/* ── Ground Platform ─────────────────────────── */}
+            {/* Ground / Sidewalk */}
             <rect
               id="z-ground"
               className={zc("ground")}
-              x="60" y="420" width="680" height="50" rx="4"
+              x="0" y="490" width="1000" height="110"
               fill={colors.ground}
               onClick={handleZoneClick("ground")}
             />
+            <rect x="0" y="490" width="1000" height="8" fill="#9a9a9a" pointerEvents="none" />
 
-            {/* ── Lower Floor Slab ────────────────────────── */}
-            <rect
-              id="z-slab-lower"
-              className={zc("slabs")}
-              x="150" y="405" width="440" height="18" rx="2"
-              fill={colors.slabs}
-              onClick={handleZoneClick("slabs")}
-            />
+            {/* Foundation base */}
+            <rect x="85" y="470" width="730" height="28" rx="2" fill="#9e9e9e" pointerEvents="none" />
 
-            {/* ── Lower Walls ─────────────────────────────── */}
-            {/* Left solid wall */}
-            <rect
-              id="z-wall-lower-left"
-              className={zc("lowerWalls")}
-              x="155" y="295" width="90" height="110" rx="0"
-              fill={colors.lowerWalls}
-              onClick={handleZoneClick("lowerWalls")}
-            />
-            {/* Small window on lower-left wall */}
-            <rect
-              id="z-glass-lower-left-win"
-              className={zc("glass", "zone-glass")}
-              x="175" y="320" width="50" height="40" rx="2"
-              fill={colors.glass}
-              onClick={handleZoneClick("glass")}
-            />
-            {/* Window frame */}
-            <rect x="175" y="320" width="50" height="40" rx="2"
-              fill="none" stroke="#9aa3ad" strokeWidth="1.5" pointerEvents="none" />
-            <line x1="200" y1="320" x2="200" y2="360"
-              stroke="#9aa3ad" strokeWidth="1" pointerEvents="none" />
-            <line x1="175" y1="340" x2="225" y2="340"
-              stroke="#9aa3ad" strokeWidth="1" pointerEvents="none" />
+            {/* ===== BUILDING STRUCTURE ===== */}
 
-            {/* Center glass doors (large sliding, 4 panels) */}
+            {/* UPPER FLOOR ROOF / Top overhang dark slab */}
             <rect
-              id="z-glass-lower-center"
-              className={zc("glass", "zone-glass")}
-              x="250" y="295" width="240" height="110" rx="2"
-              fill={colors.glass}
-              onClick={handleZoneClick("glass")}
+              id="z-roof"
+              className={zc("roof")}
+              x="70" y="90" width="760" height="32" rx="3"
+              fill={colors.roof}
+              onClick={handleZoneClick("roof")}
             />
-            {/* Door panel frames */}
-            <rect x="250" y="295" width="240" height="110" rx="2"
-              fill="none" stroke="#8a939d" strokeWidth="2" pointerEvents="none" />
-            <line x1="310" y1="295" x2="310" y2="405"
-              stroke="#8a939d" strokeWidth="1.2" pointerEvents="none" />
-            <line x1="370" y1="295" x2="370" y2="405"
-              stroke="#8a939d" strokeWidth="1.2" pointerEvents="none" />
-            <line x1="430" y1="295" x2="430" y2="405"
-              stroke="#8a939d" strokeWidth="1.2" pointerEvents="none" />
+            {/* Roof underside shadow line */}
+            <rect x="70" y="120" width="760" height="6" fill="#333333" pointerEvents="none" />
 
-            {/* Right solid wall */}
-            <rect
-              id="z-wall-lower-right"
-              className={zc("lowerWalls")}
-              x="495" y="295" width="90" height="110" rx="0"
-              fill={colors.lowerWalls}
-              onClick={handleZoneClick("lowerWalls")}
-            />
-
-            {/* ── Mid-Floor Slab (protruding) ─────────────── */}
-            <rect
-              id="z-slab-mid"
-              className={zc("slabs")}
-              x="140" y="278" width="460" height="18" rx="2"
-              fill={colors.slabs}
-              onClick={handleZoneClick("slabs")}
-            />
-
-            {/* ── Upper Walls ─────────────────────────────── */}
-            {/* Left solid wall */}
-            <rect
-              id="z-wall-upper-left"
-              className={zc("upperWalls")}
-              x="155" y="158" width="70" height="120" rx="0"
-              fill={colors.upperWalls}
-              onClick={handleZoneClick("upperWalls")}
-            />
-            {/* Small window upper-left */}
-            <rect
-              id="z-glass-upper-left-win"
-              className={zc("glass", "zone-glass")}
-              x="168" y="185" width="44" height="50" rx="2"
-              fill={colors.glass}
-              onClick={handleZoneClick("glass")}
-            />
-            <rect x="168" y="185" width="44" height="50" rx="2"
-              fill="none" stroke="#9aa3ad" strokeWidth="1.5" pointerEvents="none" />
-            <line x1="190" y1="185" x2="190" y2="235"
-              stroke="#9aa3ad" strokeWidth="1" pointerEvents="none" />
-
-            {/* Center multi-panel glass wall (6 panels) */}
-            <rect
-              id="z-glass-upper-center"
-              className={zc("glass", "zone-glass")}
-              x="230" y="158" width="280" height="120" rx="2"
-              fill={colors.glass}
-              onClick={handleZoneClick("glass")}
-            />
-            <rect x="230" y="158" width="280" height="120" rx="2"
-              fill="none" stroke="#8a939d" strokeWidth="2" pointerEvents="none" />
-            {/* Panel dividers */}
-            {[277, 324, 370, 416, 463].map((cx) => (
-              <line
-                key={cx}
-                x1={cx} y1={158} x2={cx} y2={278}
-                stroke="#8a939d" strokeWidth="1" pointerEvents="none"
-              />
-            ))}
-            {/* Horizontal mid-bar */}
-            <line x1="230" y1="218" x2="510" y2="218"
-              stroke="#8a939d" strokeWidth="1" pointerEvents="none" />
-
-            {/* Right solid wall */}
-            <rect
-              id="z-wall-upper-right"
-              className={zc("upperWalls")}
-              x="515" y="158" width="70" height="120" rx="0"
-              fill={colors.upperWalls}
-              onClick={handleZoneClick("upperWalls")}
-            />
-            {/* Small window upper-right */}
-            <rect
-              id="z-glass-upper-right-win"
-              className={zc("glass", "zone-glass")}
-              x="528" y="185" width="44" height="50" rx="2"
-              fill={colors.glass}
-              onClick={handleZoneClick("glass")}
-            />
-            <rect x="528" y="185" width="44" height="50" rx="2"
-              fill="none" stroke="#9aa3ad" strokeWidth="1.5" pointerEvents="none" />
-            <line x1="550" y1="185" x2="550" y2="235"
-              stroke="#9aa3ad" strokeWidth="1" pointerEvents="none" />
-
-            {/* ── Wood Accent Panel (ceiling accent above glass) ─ */}
+            {/* Wood / fascia beam behind roof */}
             <rect
               id="z-wood"
               className={zc("woodAccent")}
-              x="225" y="140" width="290" height="18" rx="3"
+              x="85" y="122" width="730" height="38"
               fill={colors.woodAccent}
               onClick={handleZoneClick("woodAccent")}
             />
             {/* Wood grain lines */}
-            {[0, 1, 2, 3, 4].map((i) => (
-              <line
-                key={`grain-${i}`}
-                x1={225 + i * 60 + 15}
-                y1={143}
-                x2={225 + i * 60 + 45}
-                y2={155}
-                stroke="rgba(0,0,0,0.08)"
-                strokeWidth="1"
-                pointerEvents="none"
-              />
-            ))}
+            <line x1="85" y1="130" x2="815" y2="130" stroke="#b07030" strokeWidth="1.5" opacity="0.6" pointerEvents="none" />
+            <line x1="85" y1="138" x2="815" y2="138" stroke="#b07030" strokeWidth="1" opacity="0.4" pointerEvents="none" />
+            <line x1="85" y1="146" x2="815" y2="146" stroke="#b07030" strokeWidth="1.5" opacity="0.5" pointerEvents="none" />
+            <line x1="85" y1="153" x2="815" y2="153" stroke="#b07030" strokeWidth="1" opacity="0.3" pointerEvents="none" />
 
-            {/* ── Roof Slab ───────────────────────────────── */}
-            {/* Top slab */}
+            {/* UPPER FLOOR horizontal divider slab (between floors) */}
             <rect
-              id="z-roof-top"
-              className={zc("roof")}
-              x="130" y="118" width="480" height="22" rx="3"
-              fill={colors.roof}
-              onClick={handleZoneClick("roof")}
+              id="z-slabs-mid"
+              className={zc("slabs")}
+              x="85" y="310" width="730" height="22" rx="2"
+              fill={colors.slabs}
+              onClick={handleZoneClick("slabs")}
             />
-            {/* Overhanging edge — thin darker strip */}
+            <rect x="85" y="310" width="730" height="5" fill="#6a6a6a" pointerEvents="none" />
+
+            {/* LOWER FLOOR bottom overhang/ledge (base of building above foundation) */}
             <rect
-              id="z-roof-edge"
-              className={zc("roof")}
-              x="125" y="136" width="490" height="6" rx="1"
-              fill={colors.roof}
-              style={{ filter: "brightness(0.85)" }}
-              onClick={handleZoneClick("roof")}
+              id="z-slabs-lower"
+              className={zc("slabs")}
+              x="85" y="464" width="730" height="14" rx="2"
+              fill={colors.slabs}
+              onClick={handleZoneClick("slabs")}
             />
 
-            {/* ── Steps (left side, 4 steps) ──────────────── */}
-            {[0, 1, 2, 3].map((i) => (
-              <rect
-                key={`step-${i}`}
-                id={`z-steps-${i}`}
-                className={zc("steps")}
-                x={100 - i * 14}
-                y={390 - i * 8}
-                width={55 + i * 14}
-                height={10}
-                rx="1"
-                fill={colors.steps}
-                onClick={handleZoneClick("steps")}
-              />
-            ))}
+            {/* ===== UPPER FLOOR WALLS ===== */}
 
-            {/* ── Winter Tree (right side) ────────────────── */}
-            <g transform="translate(640, 240)">
+            {/* Left wall panel (paintable) - upper floor */}
+            <rect
+              id="z-wall-upper-left"
+              className={zc("upperWalls")}
+              x="85" y="160" width="175" height="150"
+              fill={colors.upperWalls}
+              onClick={handleZoneClick("upperWalls")}
+            />
+
+            {/* CENTER GLASS SECTION upper floor */}
+            {/* Glass tile grid */}
+            <rect
+              id="z-glass-upper"
+              className={zc("glass", "zone-glass")}
+              x="260" y="160" width="380" height="150"
+              fill={colors.glass}
+              onClick={handleZoneClick("glass")}
+            />
+            {/* Vertical glass dividers */}
+            <line x1="260" y1="160" x2="260" y2="310" stroke="#a0b4c8" strokeWidth="3" pointerEvents="none" />
+            <line x1="387" y1="160" x2="387" y2="310" stroke="#a0b4c8" strokeWidth="2" pointerEvents="none" />
+            <line x1="513" y1="160" x2="513" y2="310" stroke="#a0b4c8" strokeWidth="2" pointerEvents="none" />
+            <line x1="640" y1="160" x2="640" y2="310" stroke="#a0b4c8" strokeWidth="3" pointerEvents="none" />
+            {/* Horizontal glass dividers */}
+            <line x1="260" y1="235" x2="640" y2="235" stroke="#a0b4c8" strokeWidth="2" pointerEvents="none" />
+            {/* Glass reflection shimmer */}
+            <rect x="270" y="165" width="30" height="60" fill="white" opacity="0.18" rx="2" pointerEvents="none" />
+            <rect x="400" y="165" width="20" height="60" fill="white" opacity="0.12" rx="2" pointerEvents="none" />
+            <rect x="525" y="165" width="25" height="60" fill="white" opacity="0.15" rx="2" pointerEvents="none" />
+
+            {/* Right wall panel (paintable) - upper floor */}
+            <rect
+              id="z-wall-upper-right"
+              className={zc("upperWalls")}
+              x="640" y="160" width="175" height="150"
+              fill={colors.upperWalls}
+              onClick={handleZoneClick("upperWalls")}
+            />
+
+            {/* Windows on paintable upper wall panels */}
+            {/* Left upper window glass */}
+            <rect
+              id="z-glass-win-ul"
+              className={zc("glass", "zone-glass")}
+              x="105" y="185" width="115" height="90" rx="3"
+              fill={colors.glass}
+              onClick={handleZoneClick("glass")}
+            />
+            <rect x="105" y="185" width="115" height="90" rx="3" fill="none" stroke="#7090a8" strokeWidth="4" pointerEvents="none" />
+            <line x1="162" y1="185" x2="162" y2="275" stroke="#7090a8" strokeWidth="2.5" pointerEvents="none" />
+            <line x1="105" y1="230" x2="220" y2="230" stroke="#7090a8" strokeWidth="2" pointerEvents="none" />
+            <rect x="110" y="190" width="45" height="35" fill="white" opacity="0.25" rx="2" pointerEvents="none" />
+
+            {/* Right upper window glass */}
+            <rect
+              id="z-glass-win-ur"
+              className={zc("glass", "zone-glass")}
+              x="680" y="185" width="115" height="90" rx="3"
+              fill={colors.glass}
+              onClick={handleZoneClick("glass")}
+            />
+            <rect x="680" y="185" width="115" height="90" rx="3" fill="none" stroke="#7090a8" strokeWidth="4" pointerEvents="none" />
+            <line x1="737" y1="185" x2="737" y2="275" stroke="#7090a8" strokeWidth="2.5" pointerEvents="none" />
+            <line x1="680" y1="230" x2="795" y2="230" stroke="#7090a8" strokeWidth="2" pointerEvents="none" />
+            <rect x="685" y="190" width="45" height="35" fill="white" opacity="0.25" rx="2" pointerEvents="none" />
+
+            {/* ===== LOWER FLOOR WALLS ===== */}
+
+            {/* Left wall panel (paintable) - lower floor */}
+            <rect
+              id="z-wall-lower-left"
+              className={zc("lowerWalls")}
+              x="85" y="332" width="175" height="132"
+              fill={colors.lowerWalls}
+              onClick={handleZoneClick("lowerWalls")}
+            />
+
+            {/* CENTER GLASS SECTION lower floor */}
+            <rect
+              id="z-glass-lower"
+              className={zc("glass", "zone-glass")}
+              x="260" y="332" width="380" height="132"
+              fill={colors.glass}
+              onClick={handleZoneClick("glass")}
+            />
+            {/* Vertical glass dividers lower */}
+            <line x1="260" y1="332" x2="260" y2="464" stroke="#a0b4c8" strokeWidth="3" pointerEvents="none" />
+            <line x1="387" y1="332" x2="387" y2="464" stroke="#a0b4c8" strokeWidth="2" pointerEvents="none" />
+            <line x1="513" y1="332" x2="513" y2="464" stroke="#a0b4c8" stroke-width="2" pointerEvents="none" />
+            <line x1="640" y1="332" x2="640" y2="464" stroke="#a0b4c8" strokeWidth="3" pointerEvents="none" />
+            {/* Horizontal divider lower */}
+            <line x1="260" y1="395" x2="640" y2="395" stroke="#a0b4c8" strokeWidth="2" pointerEvents="none" />
+            {/* Reflection shimmer lower */}
+            <rect x="270" y="338" width="25" height="50" fill="white" opacity="0.15" rx="2" pointerEvents="none" />
+            <rect x="525" y="338" width="20" height="50" fill="white" opacity="0.12" rx="2" pointerEvents="none" />
+
+            {/* Right wall panel (paintable) - lower floor */}
+            <rect
+              id="z-wall-lower-right"
+              className={zc("lowerWalls")}
+              x="640" y="332" width="175" height="132"
+              fill={colors.lowerWalls}
+              onClick={handleZoneClick("lowerWalls")}
+            />
+
+            {/* Lower left window glass */}
+            <rect
+              id="z-glass-win-ll"
+              className={zc("glass", "zone-glass")}
+              x="95" y="355" width="100" height="80" rx="3"
+              fill={colors.glass}
+              onClick={handleZoneClick("glass")}
+            />
+            <rect x="95" y="355" width="100" height="80" rx="3" fill="none" stroke="#7090a8" strokeWidth="3.5" pointerEvents="none" />
+            <line x1="145" y1="355" x2="145" y2="435" stroke="#7090a8" strokeWidth="2" pointerEvents="none" />
+            <line x1="95" y1="395" x2="195" y2="395" stroke="#7090a8" strokeWidth="2" pointerEvents="none" />
+            <rect x="100" y="360" width="40" height="30" fill="white" opacity="0.25" rx="2" pointerEvents="none" />
+
+            {/* Lower right window glass */}
+            <rect
+              id="z-glass-win-lr"
+              className={zc("glass", "zone-glass")}
+              x="705" y="355" width="100" height="80" rx="3"
+              fill={colors.glass}
+              onClick={handleZoneClick("glass")}
+            />
+            <rect x="705" y="355" width="100" height="80" rx="3" fill="none" stroke="#7090a8" strokeWidth="3.5" pointerEvents="none" />
+            <line x1="755" y1="355" x2="755" y2="435" stroke="#7090a8" strokeWidth="2" pointerEvents="none" />
+            <line x1="705" y1="395" x2="805" y2="395" stroke="#7090a8" strokeWidth="2" pointerEvents="none" />
+            <rect x="710" y="360" width="40" height="30" fill="white" opacity="0.25" rx="2" pointerEvents="none" />
+
+            {/* ===== ENTRANCE STEPS (lower left) ===== */}
+            <rect
+              id="z-steps"
+              className={zc("steps")}
+              x="42" y="440" width="75" height="30" rx="2"
+              fill={colors.steps}
+              onClick={handleZoneClick("steps")}
+            />
+            <rect x="50" y="450" width="60" height="20" rx="2" fill="#aaaaaa" pointerEvents="none" opacity="0.4" />
+            <rect x="58" y="460" width="45" height="10" rx="2" fill="#b8b8b8" pointerEvents="none" opacity="0.4" />
+
+            {/* ===== BUILDING SIDE COLUMNS / EDGES ===== */}
+            {/* Left edge column */}
+            <rect x="85" y="160" width="10" height="304" fill="#8a8a8a" opacity="0.5" pointerEvents="none" />
+            {/* Right edge column */}
+            <rect x="805" y="160" width="10" height="304" fill="#8a8a8a" opacity="0.4" pointerEvents="none" />
+            {/* Center vertical divider */}
+            <rect x="255" y="160" width="8" height="304" fill="#9a9a9a" opacity="0.35" pointerEvents="none" />
+            <rect x="637" y="160" width="8" height="304" fill="#9a9a9a" opacity="0.35" pointerEvents="none" />
+
+            {/* ===== BARE TREE (right side) ===== */}
+            <g transform="translate(0, 0)">
               {/* Trunk */}
-              <line className="hv-tree-line" x1="30" y1="180" x2="30" y2="60" strokeWidth="4" />
+              <line x1="890" y1="490" x2="890" y2="310" stroke="#6b4c30" strokeWidth="9" strokeLinecap="round" pointerEvents="none" />
               {/* Main branches */}
-              <line className="hv-tree-line" x1="30" y1="80" x2="0" y2="30" />
-              <line className="hv-tree-line" x1="30" y1="80" x2="60" y2="20" />
-              <line className="hv-tree-line" x1="30" y1="110" x2="5" y2="70" />
-              <line className="hv-tree-line" x1="30" y1="110" x2="65" y2="65" />
-              <line className="hv-tree-line" x1="30" y1="140" x2="10" y2="110" />
-              <line className="hv-tree-line" x1="30" y1="140" x2="55" y2="105" />
-              {/* Twigs */}
-              <line className="hv-tree-line" x1="0" y1="30" x2="-12" y2="5" strokeWidth="1.2" />
-              <line className="hv-tree-line" x1="0" y1="30" x2="12" y2="15" strokeWidth="1.2" />
-              <line className="hv-tree-line" x1="60" y1="20" x2="75" y2="0" strokeWidth="1.2" />
-              <line className="hv-tree-line" x1="60" y1="20" x2="50" y2="5" strokeWidth="1.2" />
-              <line className="hv-tree-line" x1="5" y1="70" x2="-8" y2="50" strokeWidth="1.2" />
-              <line className="hv-tree-line" x1="65" y1="65" x2="80" y2="48" strokeWidth="1.2" />
+              <line x1="890" y1="360" x2="840" y2="300" stroke="#6b4c30" strokeWidth="5" strokeLinecap="round" pointerEvents="none" />
+              <line x1="890" y1="350" x2="935" y2="285" stroke="#6b4c30" strokeWidth="5" strokeLinecap="round" pointerEvents="none" />
+              <line x1="890" y1="380" x2="850" y2="340" stroke="#6b4c30" strokeWidth="4" strokeLinecap="round" pointerEvents="none" />
+              <line x1="890" y1="375" x2="925" y2="335" stroke="#6b4c30" strokeWidth="4" strokeLinecap="round" pointerEvents="none" />
+              {/* Sub branches */}
+              <line x1="840" y1="300" x2="820" y2="270" stroke="#6b4c30" strokeWidth="3" strokeLinecap="round" pointerEvents="none" />
+              <line x1="840" y1="300" x2="855" y2="270" stroke="#6b4c30" strokeWidth="3" strokeLinecap="round" pointerEvents="none" />
+              <line x1="935" y1="285" x2="915" y2="255" stroke="#6b4c30" strokeWidth="3" strokeLinecap="round" pointerEvents="none" />
+              <line x1="935" y1="285" x2="955" y2="260" stroke="#6b4c30" strokeWidth="3" strokeLinecap="round" pointerEvents="none" />
             </g>
 
-            {/* ── House outline shadow (subtle depth) ──────── */}
-            <rect
-              x="153" y="118" width="435" height="300" rx="0"
-              fill="none" stroke="rgba(0,0,0,0.06)" strokeWidth="1"
-              pointerEvents="none"
-            />
+            {/* Shadow effects on building */}
+            {/* Left side shadow */}
+            <rect x="85" y="160" width="15" height="304" fill="black" opacity="0.07" pointerEvents="none" />
+            {/* Roof overhang shadow on fascia */}
+            <rect x="70" y="122" width="760" height="8" fill="black" opacity="0.12" pointerEvents="none" />
           </svg>
         </div>
       </div>
