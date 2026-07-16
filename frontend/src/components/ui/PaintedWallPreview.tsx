@@ -14,7 +14,9 @@ export function PaintedWallPreview({ colorHex, imageUrl, category, className = "
     // We use pure photorealistic wall textures (zoomed in so there is no sky, grass, or other elements).
     // This solves the problem of mix-blend-multiply coloring the sky, because the ENTIRE frame is just the wall!
     const isExterior = category?.toLowerCase() === "exterior";
-    const roomTemplateUrl = isExterior ? "/wall-exterior.png" : "/wall-interior.png";
+    // Commented out the exterior building template:
+    // const roomTemplateUrl = isExterior ? "/wall-exterior.png" : "/wall-interior.png";
+    const roomTemplateUrl = "/wall-interior.png";
 
     return (
         <div className={`relative overflow-hidden bg-secondary/50 ${className}`}>
